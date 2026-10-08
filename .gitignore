@@ -1,0 +1,35 @@
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment variables
+.env
+.env.*
+
+# Node.js
+node_modules/
+frontend/dist/
+
+# Maven / Java
+backend/**/target/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ML model artifacts
+models/*.pkl
+models/*.joblib
+
+# Datasets
+data/raw/*
+data/processed/*
