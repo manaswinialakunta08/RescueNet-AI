@@ -1,21 +1,53 @@
-function App() {
-  return (
-    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-5xl font-bold text-cyan-400">
-          RescueNet-AI
-        </h1>
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
-        <p className="mt-4 text-xl text-slate-300">
-          AI-Powered Flood Prediction & Smart Disaster Response
-        </p>
+// Pages
+import Home from './pages/Home';
+import Prediction from './pages/Prediction';
+import Dashboard from './pages/Dashboard';
+import RiskMap from './pages/RiskMap';
+import DisasterResponse from './pages/DisasterResponse';
+import AIAssistant from './pages/AIAssistant';
+import Login from './pages/Login';
+import Register from './pages/Register';
 
-        <button className="mt-8 rounded-lg bg-cyan-500 px-6 py-3 font-semibold text-slate-950 hover:bg-cyan-400">
-          Check Flood Risk
-        </button>
-      </div>
-    </div>
-  )
+// Helper component to scroll to top on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
 }
 
-export default App
+export default function App() {
+  return (
+    <BrowserRouter>
+      <ScrollToTop />
+      <div className="min-h-screen flex flex-col bg-[#08090F] text-[#F8FAFC] selection:bg-[#8B5CF6]/35 selection:text-white">
+        <Navbar />
+
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/prediction" element={<Prediction />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/risk-map" element={<RiskMap />} />
+            <Route path="/disaster-response" element={<DisasterResponse />} />
+            <Route path="/ai-assistant" element={<AIAssistant />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            {/* Fallback route */}
+            <Route path="*" element={<Home />} />
+          </Routes>
+        </main>
+
+        <Footer />
+      </div>
+    </BrowserRouter>
+  );
+}
