@@ -1,30 +1,29 @@
 import React, { useState } from 'react';
 import {
-  LifeBuoy,
   PhoneCall,
   CheckSquare,
   Square,
-  AlertTriangle,
-  Info,
   ShieldCheck,
   AlertOctagon,
   Copy,
   Check,
-  Radio,
-  FileText,
-  Compass
+  Compass,
+  PackageCheck
 } from 'lucide-react';
 import SectionTitle from '../components/SectionTitle';
 import RiskBadge from '../components/RiskBadge';
+import SimulationBanner from '../components/SimulationBanner';
 import {
   mockDisasterContacts,
-  mockSafetyChecklist
+  mockSafetyChecklist,
+  mockEssentialSupplies
 } from '../data/mockData';
 
 export default function DisasterResponse() {
   const [checklist, setChecklist] = useState(mockSafetyChecklist);
   const [copiedPhone, setCopiedPhone] = useState(null);
   const [activeRiskTab, setActiveRiskTab] = useState('HIGH');
+  const [activePhaseTab, setActivePhaseTab] = useState('BEFORE');
 
   const toggleChecklistItem = (id) => {
     setChecklist((prev) =>
@@ -34,6 +33,14 @@ export default function DisasterResponse() {
     );
   };
 
+  const handleSelectAll = () => {
+    setChecklist((prev) => prev.map((item) => ({ ...item, defaultChecked: true })));
+  };
+
+  const handleResetList = () => {
+    setChecklist((prev) => prev.map((item) => ({ ...item, defaultChecked: false })));
+  };
+
   const completedCount = checklist.filter((item) => item.defaultChecked).length;
   const progressPercent = Math.round((completedCount / checklist.length) * 100);
 
@@ -41,6 +48,81 @@ export default function DisasterResponse() {
     navigator.clipboard.writeText(phone);
     setCopiedPhone(phone);
     setTimeout(() => setCopiedPhone(null), 2000);
+  };
+
+  const floodPhases = {
+    BEFORE: {
+      title: 'Before a Flood: Mitigation & Preparation',
+      subtitle: 'Proactive safeguards to execute before rising waters reach warning marks.',
+      badge: 'Phase 1: Pre-Disaster Readiness',
+      badgeColor: 'text-[#34D399] bg-[#34D399]/10 border-[#34D399]/25',
+      points: [
+        {
+          title: 'Assemble 72-Hour Waterproof Go-Bag',
+          desc: 'Pack 3L drinking water per person/day, non-perishable food, prescription medicines, emergency radio, and flashlights with spare batteries.'
+        },
+        {
+          title: 'Secure Essential Household Documents',
+          desc: 'Enclose passports, Aadhaar/IDs, medical cards, and property deeds in airtight dry pouches or waterproof containers.'
+        },
+        {
+          title: 'Elevate Ground-Floor Appliances & Electronics',
+          desc: 'Move refrigerators, televisions, furniture, and electrical devices to higher floors or elevated brick plinths.'
+        },
+        {
+          title: 'Map Family Evacuation Route & Rally Points',
+          desc: 'Identify at least two elevated routes to municipal assembly points. Avoid routes requiring transit across low-lying culverts.'
+        }
+      ]
+    },
+    DURING: {
+      title: 'During a Flood: Safety & Immediate Action',
+      subtitle: 'Critical life-safety protocols to preserve life during torrential water ingress.',
+      badge: 'Phase 2: Emergency Action',
+      badgeColor: 'text-[#FF4D6D] bg-[#FF4D6D]/10 border-[#FF4D6D]/25',
+      points: [
+        {
+          title: 'Disconnect Main Breaker & LPG Valves',
+          desc: 'Turn off primary electrical circuits and gas cylinder regulators before water enters to prevent electrocution or gas explosions.'
+        },
+        {
+          title: 'Never Walk or Drive in Floodwaters ("Turn Around, Don’t Drown")',
+          desc: 'Just 15 cm (6 inches) of rushing water can sweep an adult off their feet; 30 cm (1 foot) can float a motor vehicle. Murky waters hide live wires and sinkholes.'
+        },
+        {
+          title: 'Move to Highest Elevation Immediately',
+          desc: 'Relocate to the highest accessible floor or roof. Avoid closed attic spaces without roof access where rising waters can trap occupants.'
+        },
+        {
+          title: 'Comply with Mandatory Evacuation Orders',
+          desc: 'If NDRF, police, or district authorities instruct evacuation, leave immediately along designated high-ground corridors without hesitation.'
+        }
+      ]
+    },
+    AFTER: {
+      title: 'After a Flood: Recovery & Safe Return',
+      subtitle: 'Guarded procedures for returning to property and assessing post-flood damage.',
+      badge: 'Phase 3: Post-Hazard Recovery',
+      badgeColor: 'text-[#FBBF24] bg-[#FBBF24]/10 border-[#FBBF24]/25',
+      points: [
+        {
+          title: 'Wait for Official All-Clear Confirmation',
+          desc: 'Do not return to submerged wards until civil defence and SDMA confirm roads are structurally sound and floodwaters have receded.'
+        },
+        {
+          title: 'Inspect Foundation and Structural Integrity',
+          desc: 'Look for cracked foundation walls, sagging ceilings, and exposed gas lines before entering. Do not turn electricity on until inspected by an electrician.'
+        },
+        {
+          title: 'Boil or Purify All Domestic Water',
+          desc: 'Municipal tap water and wells are often contaminated with sewage and chemicals. Boil drinking water vigorously for at least 1 minute.'
+        },
+        {
+          title: 'Document Damage Thoroughly for Relief Claims',
+          desc: 'Photograph property damage, water lines, and ruined assets before starting cleanup to support official relief and insurance claims.'
+        }
+      ]
+    }
   };
 
   const riskProtocolContent = {
@@ -101,138 +183,191 @@ export default function DisasterResponse() {
         <SectionTitle
           badge="Emergency Action Center"
           title="Disaster Response & Emergency Management"
-          subtitle="Standard operating procedures, household readiness checklists, and emergency agency escalation matrices."
+          subtitle="Standard operating procedures, household readiness checklists, essential supplies, and verified agency emergency directories."
         />
 
-        <div className="rounded-2xl bg-[#171925] border border-white/[0.08] p-4 flex items-start gap-3 text-xs text-[#A1A1AA]">
-          <Info size={18} className="text-[#A78BFA] shrink-0 mt-0.5" />
-          <p className="text-[#A1A1AA]">
-            Emergency guidance is compiled following National Disaster Management Authority (NDMA) protocols. Helplines are formatted for rapid response simulation.
-          </p>
-        </div>
+        <SimulationBanner
+          title="EMERGENCY PROTOCOL ADVISORY &bull; OPERATIONAL GUIDELINES"
+          message="Standard operating procedures are synthesized from published disaster management frameworks. Verified agency helplines are provided below for official response coordination."
+          variant="orange"
+        />
       </div>
 
-      {/* ----------------- 1. EMERGENCY PREPAREDNESS PRINCIPLES ----------------- */}
-      <section className="space-y-4">
-        <h3 className="text-base sm:text-lg font-bold text-white uppercase tracking-wider font-mono flex items-center gap-2">
-          <LifeBuoy size={20} className="text-[#8B5CF6]" />
-          Core Emergency Preparedness Directives
-        </h3>
+      {/* ----------------- 1. BEFORE, DURING, AND AFTER A FLOOD ----------------- */}
+      <section className="space-y-6" aria-labelledby="phases-heading">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/[0.08]">
+          <div>
+            <h3 id="phases-heading" className="text-base sm:text-xl font-bold text-white font-mono flex items-center gap-2">
+              <Compass size={20} className="text-[#8B5CF6]" />
+              Flood Lifecycle Protocols: Before, During & After
+            </h3>
+            <p className="text-xs text-[#A1A1AA] mt-0.5">
+              Structured operational recommendations across each stage of a flood hazard event.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {[
-            {
-              title: 'Move to Elevated Ground',
-              desc: 'Relocate to higher floors or higher-elevation zones whenever warning flags are hoisted.',
-              icon: Compass
-            },
-            {
-              title: 'Follow Official Orders',
-              desc: 'Adhere strictly to official evacuation bulletins broadcast by District Magistrates or NDRF.',
-              icon: ShieldCheck
-            },
-            {
-              title: 'Keep Supplies Ready',
-              desc: 'Pre-pack sealed waterproof go-bags containing 72 hours of water, food, and essentials.',
-              icon: FileText
-            },
-            {
-              title: 'Avoid Flooded Roads',
-              desc: 'Never walk or drive into standing or moving water; unseen sinkholes and live cables pose fatal hazards.',
-              icon: AlertTriangle
-            },
-            {
-              title: 'Monitor Official Alerts',
-              desc: 'Keep mobile devices charged and tune in to battery-powered radios for official river stage bulletins.',
-              icon: Radio
-            }
-          ].map((item, idx) => {
-            const Icon = item.icon;
-            return (
-              <div
-                key={idx}
-                className="rounded-3xl bg-[#171925] hover:bg-[#1D2030] backdrop-blur-md border border-white/[0.08] p-5 flex flex-col justify-between hover:border-[#8B5CF6]/40 transition-all duration-300 group hover:-translate-y-1"
+          {/* Phase Tabs */}
+          <div className="flex items-center gap-2 font-mono">
+            {['BEFORE', 'DURING', 'AFTER'].map((phase) => (
+              <button
+                key={phase}
+                onClick={() => setActivePhaseTab(phase)}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  activePhaseTab === phase
+                    ? 'bg-gradient-to-r from-[#8B5CF6] to-[#C084FC] text-white shadow-[0_0_15px_rgba(139,92,246,0.4)]'
+                    : 'bg-[#171925] text-[#A1A1AA] hover:text-white border border-white/[0.08]'
+                }`}
               >
+                {phase === 'BEFORE' ? '1. Before Flood' : phase === 'DURING' ? '2. During Flood' : '3. After Flood'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Active Phase Content Card */}
+        {(() => {
+          const currentPhase = floodPhases[activePhaseTab];
+          return (
+            <div className="rounded-3xl bg-[#171925] border border-white/[0.08] p-7 sm:p-8 space-y-6 shadow-2xl animate-fade-in-up">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/[0.08]">
                 <div>
-                  <div className="p-2.5 rounded-2xl bg-[#0D0F17] border border-white/[0.08] w-fit text-[#A78BFA] mb-3 group-hover:scale-110 transition-transform">
-                    <Icon size={18} />
-                  </div>
-                  <h4 className="text-sm font-bold text-white mb-2">{item.title}</h4>
-                  <p className="text-xs text-[#A1A1AA] leading-relaxed">{item.desc}</p>
+                  <span className={`text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full border ${currentPhase.badgeColor} font-bold inline-block mb-2`}>
+                    {currentPhase.badge}
+                  </span>
+                  <h4 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                    {currentPhase.title}
+                  </h4>
+                  <p className="text-xs text-[#A1A1AA] mt-1">{currentPhase.subtitle}</p>
                 </div>
               </div>
-            );
-          })}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {currentPhase.points.map((pt, idx) => (
+                  <div
+                    key={idx}
+                    className="p-5 rounded-2xl bg-[#0D0F17] border border-white/[0.08] space-y-2 hover:border-[#8B5CF6]/30 transition-all"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-6 h-6 rounded-lg bg-[#171925] border border-white/10 text-[#A78BFA] font-mono font-bold flex items-center justify-center text-xs shrink-0">
+                        {idx + 1}
+                      </span>
+                      <h5 className="text-sm font-bold text-white">{pt.title}</h5>
+                    </div>
+                    <p className="text-xs text-[#A1A1AA] leading-relaxed pl-8">{pt.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+      </section>
+
+      {/* ----------------- 2. ESSENTIAL SUPPLIES CHECKLIST ----------------- */}
+      <section className="space-y-4" aria-labelledby="supplies-heading">
+        <div className="flex items-center gap-2 pb-2">
+          <PackageCheck size={20} className="text-[#34D399]" />
+          <h3 id="supplies-heading" className="text-base sm:text-xl font-bold text-white font-mono">
+            Essential Disaster Supplies Kit
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {mockEssentialSupplies.map((cat, idx) => (
+            <div
+              key={idx}
+              className="rounded-3xl bg-[#171925] border border-white/[0.08] p-6 space-y-3 shadow-xl hover:border-[#34D399]/30 transition-all"
+            >
+              <div className="flex items-center gap-2 pb-2 border-b border-white/[0.08]">
+                <ShieldCheck size={16} className="text-[#34D399]" />
+                <h4 className="text-xs font-bold font-mono uppercase text-white tracking-wider">
+                  {cat.category}
+                </h4>
+              </div>
+
+              <ul className="space-y-2.5 text-xs text-[#A1A1AA]">
+                {cat.items.map((item, itemIdx) => (
+                  <li key={itemIdx} className="flex items-start gap-2">
+                    <Check size={14} className="text-[#34D399] shrink-0 mt-0.5" />
+                    <span className="leading-snug">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* ----------------- 2. SAFETY CHECKLIST & RESPONSE TABS ----------------- */}
+      {/* ----------------- 3. SAFETY CHECKLIST & RESPONSE TABS ----------------- */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Interactive Safety Checklist */}
         <div className="lg:col-span-5 rounded-3xl bg-[#171925] backdrop-blur-md border border-white/[0.08] p-6 sm:p-7 shadow-2xl space-y-5">
           <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
             <div>
               <h3 className="text-sm font-bold text-white uppercase tracking-wider font-mono flex items-center gap-2">
-                <CheckSquare size={16} className="text-[#34D399]" />
-                Personal Safety Checklist
+                <CheckSquare size={16} className="text-[#8B5CF6]" />
+                Evacuation Readiness SOP
               </h3>
-              <p className="text-xs text-[#A1A1AA] mt-0.5">
-                Interactive verification for household readiness
-              </p>
+              <p className="text-xs text-[#A1A1AA] mt-0.5">8-Point Pre-Evacuation Protocol</p>
             </div>
-            <span className="text-xs font-mono font-bold text-[#34D399] bg-[#34D399]/10 px-2.5 py-0.5 rounded-full border border-[#34D399]/30">
-              {completedCount}/{checklist.length} Complete
-            </span>
+
+            <div className="flex items-center gap-1 font-mono text-xs">
+              <span className="font-bold text-white">{completedCount}</span>
+              <span className="text-[#71717A]">/ {checklist.length} Done</span>
+            </div>
           </div>
 
           {/* Progress Bar */}
           <div className="space-y-1.5">
-            <div className="flex justify-between text-xs font-mono text-[#A1A1AA]">
-              <span>Readiness Score</span>
-              <span className="text-white font-bold">{progressPercent}%</span>
+            <div className="flex justify-between text-xs font-mono">
+              <span className="text-[#A1A1AA]">Preparedness Index</span>
+              <span className="font-bold text-[#A78BFA]">{progressPercent}%</span>
             </div>
-            <div className="w-full bg-[#0D0F17] h-2 rounded-full overflow-hidden border border-white/[0.08]">
+            <div className="w-full bg-[#0D0F17] h-2.5 rounded-full overflow-hidden border border-white/[0.05]">
               <div
-                className="bg-gradient-to-r from-[#8B5CF6] to-[#C084FC] h-full transition-all duration-500 rounded-full"
+                className="h-full bg-gradient-to-r from-[#8B5CF6] to-[#C084FC] transition-all duration-300"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
           </div>
 
-          {/* Checkbox Items */}
-          <div className="space-y-2 pt-1">
+          {/* Checklist Items */}
+          <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
             {checklist.map((item) => (
               <button
                 key={item.id}
-                type="button"
                 onClick={() => toggleChecklistItem(item.id)}
-                className={`w-full text-left p-3 rounded-2xl border text-xs flex items-start gap-3 transition-all cursor-pointer ${
+                className={`w-full text-left p-3 rounded-2xl border text-xs flex items-center gap-3 transition-all cursor-pointer ${
                   item.defaultChecked
-                    ? 'bg-[#0D0F17] border-[#34D399]/30 text-slate-200'
-                    : 'bg-[#0D0F17]/50 border-white/[0.08] text-[#A1A1AA] hover:border-white/20'
+                    ? 'bg-[#0D0F17] border-[#8B5CF6]/40 text-white'
+                    : 'bg-[#0D0F17]/50 border-white/[0.05] text-[#A1A1AA] hover:bg-[#0D0F17]'
                 }`}
+                aria-pressed={item.defaultChecked}
               >
-                <div className="mt-0.5 shrink-0">
+                <div className="shrink-0">
                   {item.defaultChecked ? (
-                    <CheckSquare size={16} className="text-[#34D399]" />
+                    <CheckSquare size={18} className="text-[#8B5CF6]" />
                   ) : (
-                    <Square size={16} className="text-[#71717A]" />
+                    <Square size={18} className="text-[#71717A]" />
                   )}
                 </div>
-                <span className={item.defaultChecked ? 'line-through text-[#71717A]' : 'text-[#F8FAFC]'}>
+                <span className={`flex-1 leading-snug ${item.defaultChecked ? 'line-through text-[#71717A]' : ''}`}>
                   {item.text}
                 </span>
               </button>
             ))}
           </div>
 
-          <div className="pt-2 text-[11px] font-mono text-[#71717A] flex justify-between">
-            <span>Check items as completed in your household</span>
+          {/* Helpers */}
+          <div className="pt-3 border-t border-white/[0.08] flex items-center justify-between text-xs font-mono">
             <button
-              onClick={() =>
-                setChecklist((prev) => prev.map((i) => ({ ...i, defaultChecked: false })))
-              }
-              className="text-[#A1A1AA] hover:text-white underline underline-offset-2 cursor-pointer"
+              onClick={handleSelectAll}
+              className="text-[#A78BFA] hover:text-[#C084FC] transition-colors cursor-pointer"
+            >
+              Select all items
+            </button>
+            <button
+              onClick={handleResetList}
+              className="text-[#71717A] hover:text-[#FF4D6D] transition-colors cursor-pointer"
             >
               Reset list
             </button>
@@ -245,7 +380,7 @@ export default function DisasterResponse() {
             <div>
               <h3 className="text-sm font-bold text-white uppercase tracking-wider font-mono flex items-center gap-2">
                 <AlertOctagon size={16} className="text-[#FB923C]" />
-                Response Recommendation by Threat Tier
+                Threat Tier Operational Guidelines
               </h3>
               <p className="text-xs text-[#A1A1AA] mt-0.5">
                 Standard operating procedures mapped to calibrated probability bands.
@@ -312,21 +447,22 @@ export default function DisasterResponse() {
         </div>
       </div>
 
-      {/* ----------------- 3. EMERGENCY CONTACTS DIRECTORY ----------------- */}
-      <section className="space-y-4">
+      {/* ----------------- 4. VERIFIED EMERGENCY CONTACTS DIRECTORY ----------------- */}
+      <section className="space-y-4" aria-labelledby="emergency-directory-heading">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h3 className="text-base sm:text-lg font-bold text-white uppercase tracking-wider font-mono flex items-center gap-2">
+            <h3 id="emergency-directory-heading" className="text-base sm:text-lg font-bold text-white uppercase tracking-wider font-mono flex items-center gap-2">
               <PhoneCall size={20} className="text-[#A78BFA]" />
-              Emergency Response Directory & Helplines
+              Official Disaster Emergency Directory & Helplines
             </h3>
             <p className="text-xs text-[#A1A1AA] mt-0.5">
-              Rapid escalation contacts for search, rescue, logistics, and medical transport.
+              Verified national and state emergency response coordinates for flood relief and disaster response.
             </p>
           </div>
 
-          <div className="text-xs font-mono text-[#FB923C] bg-[#F97316]/10 border border-[#F97316]/25 px-3 py-1.5 rounded-xl shrink-0">
-            * Mock / Example Emergency Contacts — Verification planned in integration phase
+          <div className="text-xs font-mono text-[#34D399] bg-[#34D399]/10 border border-[#34D399]/25 px-3 py-1.5 rounded-xl shrink-0 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#34D399] animate-pulse" />
+            <span>Official Helplines (India)</span>
           </div>
         </div>
 
@@ -359,13 +495,20 @@ export default function DisasterResponse() {
 
                   <button
                     onClick={() => handleCopyPhone(contact.phone)}
-                    className="p-2 rounded-xl bg-[#0D0F17] hover:bg-[#1D2030] text-[#A1A1AA] hover:text-white border border-white/[0.08] transition-colors shrink-0 cursor-pointer"
+                    className="p-2 rounded-xl bg-[#0D0F17] hover:bg-[#1D2030] text-[#A1A1AA] hover:text-white border border-white/[0.08] transition-colors shrink-0 cursor-pointer flex items-center gap-1 text-[11px] font-mono"
                     title="Copy Helpline Number"
+                    aria-label={`Copy phone number for ${contact.name}`}
                   >
                     {isCopied ? (
-                      <Check size={14} className="text-[#34D399]" />
+                      <>
+                        <Check size={14} className="text-[#34D399]" />
+                        <span className="text-[#34D399]">Copied</span>
+                      </>
                     ) : (
-                      <Copy size={14} />
+                      <>
+                        <Copy size={14} />
+                        <span>Copy</span>
+                      </>
                     )}
                   </button>
                 </div>

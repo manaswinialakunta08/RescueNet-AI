@@ -59,6 +59,8 @@ export default function RiskBadge({ level = 'LOW', size = 'md', showIcon = true,
 
   return (
     <span
+      role="status"
+      aria-label={`Flood Threat Level: ${config.label}`}
       className={`inline-flex items-center rounded-full border tracking-wider uppercase font-mono transition-all backdrop-blur-sm ${config.bg} ${config.border} ${config.text} ${config.glow} ${sizeClasses[size] || sizeClasses.md}`}
     >
       <span className="relative flex h-2 w-2 shrink-0">

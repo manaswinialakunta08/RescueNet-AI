@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import {
   ShieldAlert,
   Menu,
@@ -26,14 +26,22 @@ const NAV_ITEMS = [
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 15);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close mobile menu on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   return (
@@ -41,16 +49,17 @@ export default function Navbar() {
       <div
         className={`max-w-7xl mx-auto rounded-2xl transition-all duration-300 ${
           scrolled
-            ? 'bg-[#0D0F17]/90 backdrop-blur-xl border border-[#8B5CF6]/20 shadow-[0_8px_32px_rgba(8,9,15,0.8)]'
-            : 'bg-[#0D0F17]/60 backdrop-blur-md border border-white/[0.08] shadow-lg'
+            ? 'bg-[#0D0F17]/90 backdrop-blur-xl border border-[#8B5CF6]/20 shadow-[0_8px_32px_rgba(8,9,15,0.85)]'
+            : 'bg-[#0D0F17]/70 backdrop-blur-md border border-white/[0.08] shadow-lg'
         }`}
       >
         <div className="flex items-center justify-between h-16 px-4 sm:px-6">
-          {/* Logo with Shield + Pulse aesthetic */}
+          {/* Logo with Shield & Radar Beacon */}
           <Link
             to="/"
-            className="flex items-center gap-3 group shrink-0"
             onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-3 group shrink-0 focus-visible:rounded-xl"
+            aria-label="RescueNet-AI Home"
           >
             <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B5CF6]/25 to-[#C084FC]/10 border border-[#8B5CF6]/40 group-hover:border-[#A78BFA] transition-all shadow-[0_0_15px_rgba(139,92,246,0.25)]">
               <span className="absolute inset-0 rounded-xl bg-[#8B5CF6]/10 animate-pulse-ring" />
@@ -67,35 +76,55 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1 bg-[#08090F]/70 px-2 py-1.5 rounded-xl border border-white/[0.08]">
+          <nav className="hidden lg:flex items-center gap-1 bg-[#08090F]/70 px-2 py-1.5 rounded-xl border border-white/[0.08]" aria-label="Main Navigation">
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.path;
               return (
                 <NavLink
                   key={item.path}
                   to={item.path}
-                  className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all ${
-                    isActive
-                      ? 'text-white bg-[#171925] border border-[#8B5CF6]/30 shadow-[0_0_12px_rgba(139,92,246,0.2)]'
-                      : 'text-[#A1A1AA] hover:text-white hover:bg-white/5'
-                  }`}
+                  className={({ isActive }) =>
+                    `relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all ${
+                      isActive
+                        ? 'text-white bg-[#171925] border border-[#8B5CF6]/35 shadow-[0_0_12px_rgba(139,92,246,0.2)]'
+                        : 'text-[#A1A1AA] hover:text-white hover:bg-white/5'
+                    }`
+                  }
                 >
-                  <Icon size={14} className={isActive ? 'text-[#A78BFA]' : 'text-[#71717A]'} />
-                  <span>{item.name}</span>
-                  {isActive && (
-                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-[2px] bg-[#8B5CF6] rounded-full shadow-[0_0_6px_#8B5CF6]" />
+                  {({ isActive }) => (
+                    <>
+                      <Icon size={14} className={isActive ? 'text-[#A78BFA]' : 'text-[#71717A]'} />
+                      <span>{item.name}</span>
+                      {isActive && (
+                        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-[2px] bg-[#8B5CF6] rounded-full shadow-[0_0_6px_#8B5CF6]" />
+                      )}
+                    </>
                   )}
                 </NavLink>
               );
             })}
           </nav>
 
-          {/* Right Auth Links */}
+          {/* Right Status Badge & Actions */}
           <div className="hidden md:flex items-center gap-2.5">
+            {/* Simulation Status Pill */}
+            <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#171925] border border-white/[0.08] text-[10px] font-mono text-[#A1A1AA]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#34D399] animate-pulse" />
+              <span>Simulated Feed</span>
+            </div>
+
+            {/* Prominent Prediction CTA */}
+            <Link
+              to="/prediction"
+              className="relative group overflow-hidden px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#8B5CF6] via-[#A78BFA] to-[#C084FC] hover:shadow-[0_0_22px_rgba(139,92,246,0.5)] transition-all flex items-center gap-1.5 shrink-0"
+            >
+              <BrainCircuit size={14} className="text-white" />
+              <span>Predict Flood Risk</span>
+            </Link>
+
             <Link
               to="/login"
-              className="px-3.5 py-1.5 rounded-xl text-xs font-medium text-[#A1A1AA] hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all"
+              className="px-3 py-1.5 rounded-xl text-xs font-medium text-[#A1A1AA] hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all"
             >
               <span className="flex items-center gap-1.5">
                 <LogIn size={13} className="text-[#71717A]" />
@@ -105,10 +134,10 @@ export default function Navbar() {
 
             <Link
               to="/register"
-              className="relative group overflow-hidden px-4 py-1.5 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-[#8B5CF6] to-[#C084FC] hover:shadow-[0_0_20px_rgba(139,92,246,0.4)] transition-all"
+              className="px-3 py-1.5 rounded-xl text-xs font-medium text-[#A1A1AA] hover:text-white bg-[#171925] hover:bg-[#1D2030] border border-white/[0.08] transition-all"
             >
-              <span className="relative z-10 flex items-center gap-1.5">
-                <UserPlus size={13} />
+              <span className="flex items-center gap-1.5">
+                <UserPlus size={13} className="text-[#A78BFA]" />
                 <span>Register</span>
               </span>
             </Link>
@@ -124,8 +153,9 @@ export default function Navbar() {
             </Link>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-xl text-[#A1A1AA] hover:text-white hover:bg-white/5 border border-white/[0.08]"
+              className="p-2 rounded-xl text-[#A1A1AA] hover:text-white hover:bg-white/5 border border-white/[0.08] focus-visible:ring-2 focus-visible:ring-[#8B5CF6]"
               aria-label="Toggle navigation menu"
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -138,20 +168,25 @@ export default function Navbar() {
         <div className="lg:hidden mt-2 max-w-7xl mx-auto rounded-2xl bg-[#0D0F17]/95 backdrop-blur-xl border border-[#8B5CF6]/20 p-4 space-y-1.5 shadow-2xl animate-fade-in-up">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === item.path;
             return (
               <NavLink
                 key={item.path}
                 to={item.path}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
-                  isActive
-                    ? 'bg-[#171925] text-[#A78BFA] border border-[#8B5CF6]/30 font-semibold'
-                    : 'text-[#A1A1AA] hover:bg-white/5 hover:text-white'
-                }`}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
+                    isActive
+                      ? 'bg-[#171925] text-[#A78BFA] border border-[#8B5CF6]/30 font-semibold'
+                      : 'text-[#A1A1AA] hover:bg-white/5 hover:text-white'
+                  }`
+                }
               >
-                <Icon size={16} className={isActive ? 'text-[#A78BFA]' : 'text-[#71717A]'} />
-                <span>{item.name}</span>
+                {({ isActive }) => (
+                  <>
+                    <Icon size={16} className={isActive ? 'text-[#A78BFA]' : 'text-[#71717A]'} />
+                    <span>{item.name}</span>
+                  </>
+                )}
               </NavLink>
             );
           })}

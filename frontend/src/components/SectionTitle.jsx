@@ -23,7 +23,7 @@ export default function SectionTitle({
       </h2>
 
       {subtitle && (
-        <p className="text-sm sm:text-base text-[#A1A1AA] leading-relaxed max-w-2xl">
+        <p className={`text-sm sm:text-base text-[#A1A1AA] leading-relaxed max-w-2xl ${isCenter ? 'mx-auto' : ''}`}>
           {subtitle}
         </p>
       )}

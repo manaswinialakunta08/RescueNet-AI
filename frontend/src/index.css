@@ -52,7 +52,7 @@ body {
 }
 
 .bg-radial-glow {
-  background: radial-gradient(circle at 50% 18%, rgba(139, 92, 246, 0.15), rgba(192, 132, 252, 0.06) 35%, rgba(249, 115, 22, 0.03) 60%, transparent 80%);
+  background: radial-gradient(circle at 50% 18%, rgba(139, 92, 246, 0.16), rgba(192, 132, 252, 0.07) 35%, rgba(249, 115, 22, 0.03) 60%, transparent 80%);
 }
 
 .bg-radial-bottom {
@@ -65,7 +65,7 @@ body {
     transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(-9px) rotate(0.3deg);
+    transform: translateY(-8px) rotate(0.25deg);
   }
 }
 
@@ -74,7 +74,7 @@ body {
     transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(-13px) rotate(-0.4deg);
+    transform: translateY(-12px) rotate(-0.3deg);
   }
 }
 
@@ -83,7 +83,7 @@ body {
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-7px);
+    transform: translateY(-6px);
   }
 }
 
@@ -114,7 +114,7 @@ body {
 @keyframes dropIn {
   0% {
     opacity: 0;
-    transform: translateY(-28px);
+    transform: translateY(-24px);
   }
   100% {
     opacity: 1;
@@ -125,7 +125,7 @@ body {
 @keyframes fadeInUp {
   0% {
     opacity: 0;
-    transform: translateY(22px);
+    transform: translateY(18px);
   }
   100% {
     opacity: 1;
@@ -154,11 +154,27 @@ body {
 }
 
 .animate-drop-in {
-  animation: dropIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: dropIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Surface Utility Classes */
+.surface-card {
+  background-color: #171925;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.surface-card-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.surface-card-hover:hover {
+  background-color: #1D2030;
+  border-color: rgba(139, 92, 246, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -10px rgba(8, 9, 15, 0.9), 0 0 20px -5px rgba(139, 92, 246, 0.18);
 }
 
 /* Glass Card Styles */
@@ -176,14 +192,10 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.glass-panel-hover {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.glass-panel-hover:hover {
-  background-color: #1D2030;
-  border-color: rgba(139, 92, 246, 0.35);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px -10px rgba(8, 9, 15, 0.9), 0 0 25px -5px rgba(139, 92, 246, 0.18);
+/* Button & Form Focus Helpers */
+:focus-visible {
+  outline: 2px solid #8B5CF6;
+  outline-offset: 2px;
 }
 
 /* Custom Scrollbar */

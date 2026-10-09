@@ -11,7 +11,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           {/* Brand Column */}
           <div className="md:col-span-2 space-y-4">
-            <Link to="/" className="flex items-center gap-2.5 text-white font-bold text-lg group">
+            <Link to="/" className="flex items-center gap-2.5 text-white font-bold text-lg group focus-visible:rounded-xl">
               <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#8B5CF6]/25 to-[#C084FC]/10 border border-[#8B5CF6]/40 flex items-center justify-center text-[#A78BFA] group-hover:border-[#A78BFA] transition-all">
                 <ShieldAlert size={18} />
               </div>
@@ -20,23 +20,23 @@ export default function Footer() {
               </span>
             </Link>
 
-            <p className="text-[#F8FAFC] max-w-md text-sm leading-relaxed">
-              AI-powered flood prediction and smart disaster response.
+            <p className="text-[#F8FAFC] max-w-md text-sm leading-relaxed font-medium">
+              AI-Powered Flood Prediction & Smart Disaster Response Platform.
             </p>
 
             <p className="text-[#A1A1AA] max-w-md text-xs leading-relaxed">
-              Research-oriented project for intelligent flood-risk assessment and disaster decision support.
+              Research-oriented platform for intelligent flood-risk assessment and disaster decision support.
               Synthesizing hydrology, meteorological parameters, and predictive analytics for climate resilience.
             </p>
 
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#171925] border border-white/[0.08] text-[11px] font-mono text-[#FB923C]">
               <AlertCircle size={14} className="shrink-0" />
-              <span>Current Status: Frontend Prototype (Simulated Telemetry Matrix)</span>
+              <span>Notice: Simulated Prototype &bull; Real-time sensor feeds simulated for demonstration</span>
             </div>
           </div>
 
           {/* Platform Navigation */}
-          <div>
+          <nav aria-label="Footer Modules">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-white font-mono mb-4">
               Platform Modules
             </h4>
@@ -72,7 +72,7 @@ export default function Footer() {
                 </Link>
               </li>
             </ul>
-          </div>
+          </nav>
 
           {/* Research & Architecture */}
           <div>

@@ -1,26 +1,33 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Info,
   Compass,
   AlertTriangle,
   CloudRain,
   TrendingUp,
   Waves,
   Navigation,
-  ShieldAlert
+  ShieldAlert,
+  Search
 } from 'lucide-react';
 import SectionTitle from '../components/SectionTitle';
 import RiskBadge from '../components/RiskBadge';
+import SimulationBanner from '../components/SimulationBanner';
 import { mockRiskLocations } from '../data/mockData';
 
 export default function RiskMap() {
   const [selectedLocation, setSelectedLocation] = useState(mockRiskLocations[0]);
   const [activeFilter, setActiveFilter] = useState('ALL');
 
+  const [searchQuery, setSearchQuery] = useState('');
+
   const filteredLocations = mockRiskLocations.filter((loc) => {
-    if (activeFilter === 'ALL') return true;
-    return loc.riskLevel === activeFilter;
+    const matchesFilter = activeFilter === 'ALL' || loc.riskLevel === activeFilter;
+    const matchesSearch =
+      loc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      loc.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      loc.basin.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesFilter && matchesSearch;
   });
 
   const getCoordinatesPercent = (lat, lng) => {
@@ -46,17 +53,11 @@ export default function RiskMap() {
         />
 
         {/* Demo Disclaimer */}
-        <div className="rounded-2xl bg-[#F97316]/10 border border-[#F97316]/30 p-4 flex items-start gap-3 text-xs text-[#A1A1AA]">
-          <Info size={18} className="text-[#FB923C] shrink-0 mt-0.5" />
-          <div>
-            <span className="font-semibold text-[#FB923C] font-mono uppercase text-[11px] block">
-              Demo visualization — live map integration planned
-            </span>
-            <p className="text-[#A1A1AA] mt-0.5">
-              These are mock/demo monitoring locations displayed on an interactive spatial matrix. Vector tile layers and live CWC satellite radar overlays will be connected in subsequent phases.
-            </p>
-          </div>
-        </div>
+        <SimulationBanner
+          title="GEOSPATIAL SIMULATION MATRIX &bull; MOCK LOCATIONS"
+          message="Monitoring nodes and sensor readings are simulated representations of Indian river catchments. Live vector tiles, Doppler radar, and satellite precipitation overlays will be connected in subsequent phases."
+          variant="amber"
+        />
       </div>
 
       {/* Main Map + Detail Split */}
@@ -64,7 +65,7 @@ export default function RiskMap() {
         {/* Map Visual Console */}
         <div className="lg:col-span-8 rounded-3xl bg-[#171925] backdrop-blur-xl border border-white/[0.08] p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden min-h-[560px]">
           {/* Header Toolbar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-white/[0.08] text-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/[0.08] text-xs">
             <div className="flex items-center gap-2">
               <Compass size={16} className="text-[#A78BFA]" />
               <span className="font-mono font-bold text-white uppercase text-[11px] tracking-wider">
@@ -72,22 +73,35 @@ export default function RiskMap() {
               </span>
             </div>
 
-            {/* Filter Pills */}
-            <div className="flex items-center gap-1.5 font-mono">
-              <span className="text-[#71717A] text-[11px] mr-1">Filter:</span>
-              {['ALL', 'CRITICAL', 'HIGH', 'MODERATE', 'LOW'].map((lvl) => (
-                <button
-                  key={lvl}
-                  onClick={() => setActiveFilter(lvl)}
-                  className={`px-2.5 py-1 rounded-lg text-[10px] transition-all cursor-pointer ${
-                    activeFilter === lvl
-                      ? 'bg-gradient-to-r from-[#8B5CF6] to-[#C084FC] text-white font-bold shadow-[0_0_12px_rgba(139,92,246,0.4)]'
-                      : 'bg-[#0D0F17] text-[#A1A1AA] hover:text-white border border-white/[0.08]'
-                  }`}
-                >
-                  {lvl}
-                </button>
-              ))}
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Search Box */}
+              <div className="relative">
+                <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#71717A]" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search basin, city..."
+                  className="pl-7 pr-3 py-1 rounded-lg bg-[#0D0F17] border border-white/[0.08] text-white text-[11px] font-mono focus:outline-none focus:border-[#8B5CF6] placeholder:text-[#71717A] w-36 sm:w-44"
+                />
+              </div>
+
+              {/* Filter Pills */}
+              <div className="flex items-center gap-1 font-mono">
+                {['ALL', 'CRITICAL', 'HIGH', 'MODERATE', 'LOW'].map((lvl) => (
+                  <button
+                    key={lvl}
+                    onClick={() => setActiveFilter(lvl)}
+                    className={`px-2 py-1 rounded-lg text-[10px] transition-all cursor-pointer ${
+                      activeFilter === lvl
+                        ? 'bg-gradient-to-r from-[#8B5CF6] to-[#C084FC] text-white font-bold shadow-[0_0_12px_rgba(139,92,246,0.4)]'
+                        : 'bg-[#0D0F17] text-[#A1A1AA] hover:text-white border border-white/[0.08]'
+                    }`}
+                  >
+                    {lvl}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -96,6 +110,7 @@ export default function RiskMap() {
             {/* Grid Pattern */}
             <div
               className="absolute inset-0 opacity-20 pointer-events-none"
+              aria-hidden="true"
               style={{
                 backgroundImage:
                   'radial-gradient(#8B5CF6 1px, transparent 1px), radial-gradient(#C084FC 1px, transparent 1px)',
@@ -108,6 +123,7 @@ export default function RiskMap() {
             <svg
               viewBox="0 0 500 550"
               className="w-full h-full max-w-[440px] max-h-[480px] opacity-25 stroke-[#8B5CF6] fill-[#12141F] pointer-events-none"
+              aria-label="Map Silhouette of India"
             >
               <path
                 d="M 180,40 L 220,30 L 260,50 L 250,90 L 320,110 L 370,120 L 420,130 L 450,150 L 420,180 L 380,180 L 330,210 L 310,240 L 340,280 L 330,320 L 290,380 L 260,450 L 240,510 L 230,520 L 220,490 L 200,430 L 170,380 L 150,330 L 130,270 L 110,230 L 120,200 L 140,160 L 160,110 Z"
@@ -134,6 +150,7 @@ export default function RiskMap() {
                     isSelected ? 'scale-125 z-30' : 'hover:scale-115'
                   }`}
                   title={`${loc.name} (${loc.riskLevel})`}
+                  aria-label={`Select station ${loc.name}, Threat level: ${loc.riskLevel}`}
                 >
                   {(isCrit || isHigh) && (
                     <span

@@ -86,7 +86,7 @@ export default function StatCard({
         </div>
 
         {Icon && (
-          <div className={`rounded-xl p-2.5 shrink-0 transition-transform duration-300 group-hover:scale-110 ${styles.iconBg} ${styles.iconColor}`}>
+          <div className={`rounded-xl p-2.5 shrink-0 transition-transform duration-300 group-hover:scale-110 ${styles.iconBg} ${styles.iconColor}`} aria-hidden="true">
             <Icon size={20} />
           </div>
         )}

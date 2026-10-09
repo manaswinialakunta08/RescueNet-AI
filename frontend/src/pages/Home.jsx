@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import SectionTitle from '../components/SectionTitle';
 import RiskBadge from '../components/RiskBadge';
+import SimulationBanner from '../components/SimulationBanner';
 import {
   mockCapabilities,
   mockWorkflowSteps,
@@ -66,9 +67,9 @@ export default function Home() {
       {/* 1. CINEMATIC HERO SECTION                            */}
       {/* ---------------------------------------------------- */}
       <section className="relative min-h-[90vh] flex items-center justify-center pt-8 pb-16 px-4 sm:px-6 lg:px-8 bg-grid-pattern bg-radial-glow">
-        {/* Subtle background environmental particles & orbs */}
-        <div className="absolute top-1/4 left-10 w-72 h-72 rounded-full bg-[#8B5CF6]/15 blur-[100px] pointer-events-none" />
-        <div className="absolute top-1/3 right-10 w-96 h-96 rounded-full bg-[#C084FC]/10 blur-[120px] pointer-events-none" />
+        {/* Subtle background environmental ambient orbs */}
+        <div className="absolute top-1/4 left-10 w-72 h-72 rounded-full bg-[#8B5CF6]/15 blur-[100px] pointer-events-none" aria-hidden="true" />
+        <div className="absolute top-1/3 right-10 w-96 h-96 rounded-full bg-[#C084FC]/10 blur-[120px] pointer-events-none" aria-hidden="true" />
 
         <div className="max-w-7xl mx-auto w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
@@ -93,16 +94,16 @@ export default function Home() {
 
               {/* Subtitle */}
               <p className="text-base sm:text-lg text-[#A1A1AA] max-w-xl leading-relaxed">
-                RescueNet-AI combines environmental intelligence, machine learning, and disaster-response information to support faster and smarter flood-risk decisions.
+                RescueNet-AI combines environmental intelligence, machine learning, and disaster-response protocols to support faster, smarter flood-risk mitigation across vulnerable river basins.
               </p>
 
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <Link
                   to="/prediction"
-                  className="group relative overflow-hidden inline-flex items-center gap-2.5 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[#8B5CF6] to-[#C084FC] text-white font-bold text-sm tracking-wide shadow-[0_0_25px_rgba(139,92,246,0.35)] hover:shadow-[0_0_35px_rgba(192,132,252,0.5)] transition-all duration-300 transform hover:-translate-y-0.5"
+                  className="group relative overflow-hidden inline-flex items-center gap-2.5 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[#8B5CF6] via-[#A78BFA] to-[#C084FC] text-white font-bold text-sm tracking-wide shadow-[0_0_25px_rgba(139,92,246,0.35)] hover:shadow-[0_0_35px_rgba(192,132,252,0.5)] transition-all duration-300 transform hover:-translate-y-0.5"
                 >
-                  <span>Check Flood Risk</span>
+                  <span>Explore Flood Prediction</span>
                   <ArrowRight size={17} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
 
@@ -111,7 +112,7 @@ export default function Home() {
                   className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#171925] hover:bg-[#1D2030] text-[#F8FAFC] border border-white/[0.08] hover:border-[#8B5CF6]/40 font-semibold text-sm tracking-wide transition-all backdrop-blur-md"
                 >
                   <Activity size={17} className="text-[#A78BFA]" />
-                  <span>Explore Platform</span>
+                  <span>Explore the Platform</span>
                 </Link>
               </div>
 
@@ -139,7 +140,7 @@ export default function Home() {
               {/* Central Geographic Radar Surface Canvas */}
               <div className="relative w-full max-w-lg aspect-square rounded-3xl bg-gradient-to-b from-[#171925] to-[#0D0F17] border border-[#8B5CF6]/25 p-6 shadow-[0_0_50px_rgba(8,9,15,0.9)] overflow-hidden flex flex-col justify-between">
                 {/* Background Radar Rings */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
                   {/* Concentric rings */}
                   <div className="w-[85%] h-[85%] rounded-full border border-[#8B5CF6]/10" />
                   <div className="w-[65%] h-[65%] rounded-full border border-[#8B5CF6]/15" />
@@ -163,13 +164,13 @@ export default function Home() {
                     </span>
                   </div>
                   <span className="font-mono text-[#34D399] text-[10px] bg-[#34D399]/10 border border-[#34D399]/20 px-2 py-0.5 rounded-full">
-                    AI Active
+                    AI Active (Simulated)
                   </span>
                 </div>
 
                 {/* Center Geospatial Topology Silhouette */}
                 <div className="relative z-10 flex-1 flex items-center justify-center my-3">
-                  <svg viewBox="0 0 400 400" className="w-full h-full max-h-64 opacity-80">
+                  <svg viewBox="0 0 400 400" className="w-full h-full max-h-64 opacity-80" aria-label="Abstract topographic flood basin visualization">
                     {/* Abstract Topographic Contour Curves */}
                     <path
                       d="M 50,200 Q 120,120 200,180 T 350,150"
@@ -299,8 +300,8 @@ export default function Home() {
           {/* Header Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
             <div>
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 text-[#A78BFA] text-[10px] font-mono font-bold uppercase tracking-wider mb-1">
-                <span>DEMO / MOCK DATA TELEMETRY FEED</span>
+              <div className="mb-2">
+                <SimulationBanner compact title="SIMULATED TELEMETRY FEED" variant="violet" />
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-white">
                 Live Regional Intelligence Preview
@@ -744,7 +745,7 @@ export default function Home() {
       {/* ---------------------------------------------------- */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="rounded-3xl bg-gradient-to-b from-[#171925] to-[#08090F] border border-[#8B5CF6]/30 p-10 sm:p-16 space-y-6 shadow-2xl relative overflow-hidden">
-          <div className="absolute inset-0 bg-radial-glow opacity-50 pointer-events-none" />
+          <div className="absolute inset-0 bg-radial-glow opacity-50 pointer-events-none" aria-hidden="true" />
 
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 text-[#A78BFA] text-xs font-mono uppercase tracking-wider">
             <span>Explore The Platform</span>

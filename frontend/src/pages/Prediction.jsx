@@ -8,12 +8,12 @@ import {
   Waves,
   Layers,
   ArrowRight,
-  Info,
   ShieldCheck,
   Zap
 } from 'lucide-react';
 import SectionTitle from '../components/SectionTitle';
 import PredictionCard from '../components/PredictionCard';
+import SimulationBanner from '../components/SimulationBanner';
 import { mockSampleScenarios } from '../data/mockData';
 
 const INITIAL_FORM_STATE = {
@@ -154,7 +154,7 @@ export default function Prediction() {
       if (probability >= 85) {
         riskLevel = 'CRITICAL';
         recommendation =
-          'CRITICAL FLOOD DANGER: Impending overspill detected. Immediate evacuation of low-lying floodplains is strongly advised. Follow local NDRF and emergency directives.';
+          'CRITICAL FLOOD DANGER: Impending channel overspill detected. Immediate evacuation of low-lying floodplains is strongly advised. Follow local NDRF and emergency directives.';
       } else if (probability >= 65) {
         riskLevel = 'HIGH';
         recommendation =
@@ -195,21 +195,15 @@ export default function Prediction() {
         <SectionTitle
           badge="Predictive Inundation Engine"
           title="Flood Risk Prediction"
-          subtitle="Provide environmental and geographic conditions to estimate flood risk."
+          subtitle="Provide environmental and geographic conditions to estimate flood risk using calibrated simulation models."
         />
 
         {/* Integration Status Notice */}
-        <div className="rounded-2xl bg-[#F97316]/10 border border-[#F97316]/30 p-4 flex items-start gap-3 text-xs text-[#A1A1AA]">
-          <Info size={18} className="text-[#FB923C] shrink-0 mt-0.5" />
-          <div>
-            <span className="font-semibold text-[#FB923C] font-mono uppercase text-[11px] block">
-              Simulation Interface — ML Backend Integration in Phase 2
-            </span>
-            <p className="text-[#A1A1AA] mt-0.5">
-              Form parameters match the 13 features in our raw India dataset. Predictions currently run on a calibrated simulation algorithm while XGBoost models are trained in Python.
-            </p>
-          </div>
-        </div>
+        <SimulationBanner
+          title="SIMULATION INTERFACE &bull; CALIBRATED MODEL DEMO"
+          message="Parameters reflect the 13 raw India dataset features. Inundation probabilities are computed using a calibrated simulation algorithm while trained XGBoost / LightGBM models are prepared in Python."
+          variant="orange"
+        />
       </div>
 
       {/* Benchmark Presets */}
@@ -256,7 +250,7 @@ export default function Prediction() {
                   <h3 className="text-sm font-bold text-white font-mono uppercase tracking-wider">
                     1. Geographic Location & Topography
                   </h3>
-                  <p className="text-[11px] text-[#A1A1AA]">Spatial telemetry and land height</p>
+                  <p className="text-[11px] text-[#A1A1AA]">Spatial telemetry and terrain elevation</p>
                 </div>
               </div>
 
@@ -398,7 +392,7 @@ export default function Prediction() {
                   <h3 className="text-sm font-bold text-white font-mono uppercase tracking-wider">
                     3. Hydrological Factors
                   </h3>
-                  <p className="text-[11px] text-[#A1A1AA]">River flow rates and channel stages</p>
+                  <p className="text-[11px] text-[#A1A1AA]">River flow velocity and channel heights</p>
                 </div>
               </div>
 
@@ -466,7 +460,7 @@ export default function Prediction() {
                   <h3 className="text-sm font-bold text-white font-mono uppercase tracking-wider">
                     4. Land, Soil & Demographics
                   </h3>
-                  <p className="text-[11px] text-[#A1A1AA]">Surface retention and population density</p>
+                  <p className="text-[11px] text-[#A1A1AA]">Surface retention and population exposure</p>
                 </div>
               </div>
 
@@ -548,7 +542,7 @@ export default function Prediction() {
                 {isAnalyzing ? (
                   <>
                     <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span className="font-mono">Processing Hydro-Meteorological Features...</span>
+                    <span className="font-mono">Processing 13 Hydro-Meteorological Features...</span>
                   </>
                 ) : (
                   <>

@@ -478,6 +478,22 @@ export const mockChatInitialMessages = [
 
 export const mockKnowledgeBase = [
   {
+    keywords: ['prepare', 'preparation', 'how can i prepare for a flood'],
+    answer: 'To prepare effectively before floodwaters rise:\n• Identify elevated community rally points and safe evacuation corridors away from low-lying culverts.\n• Assemble a sealed waterproof "Go-Bag" with 72 hours of water, ready-to-eat rations, and first-aid supplies.\n• Protect essential identification, property deeds, and medical prescriptions in airtight dry bags.\n• Inspect household drainage traps and elevate ground-floor electronics and valuable items.'
+  },
+  {
+    keywords: ['score', 'high flood-risk score', 'what does a high flood-risk score mean', 'meaning', 'threshold'],
+    answer: 'A HIGH flood-risk score (66% - 85% probability) indicates:\n• Runoff volume is approaching or exceeding local stormwater drainage absorption capacity.\n• Upstream river discharge and rainfall accumulation are significantly above historical safe margins.\n• Low-lying floodplains, basements, and underpasses face imminent waterlogging within 3 to 6 hours.\n• Operational Recommendation: Stage emergency evacuation equipment and prepare to relocate vulnerable family members.'
+  },
+  {
+    keywords: ['heavy rainfall', 'what should i do during heavy rainfall', 'rain', 'downpour', 'cloudburst'],
+    answer: 'During periods of torrential downpours and heavy rainfall:\n• Stay indoors and avoid basement levels or underground transit hubs.\n• Never attempt to drive or walk through flooded streets — just 15 cm of moving water can sweep an adult off their feet.\n• Disconnect high-voltage household electrical appliances and turn off LPG gas valves.\n• Continuously monitor local district disaster management alerts (SDMA/NDRF) on battery-operated radios or mobile networks.'
+  },
+  {
+    keywords: ['communities', 'reduce flood damage', 'how can communities reduce flood damage', 'infrastructure', 'prevention'],
+    answer: 'Communities can systematically mitigate flood devastation through:\n• Preserving natural wetland buffer zones and restoring urban water retention ponds.\n• Upgrading storm drainage networks and installing non-return backflow valves on coastal sluices.\n• Implementing granular sensor-based early warning networks and community flood barrier programs.\n• Enforcing strict zoning regulations preventing unauthorized construction on designated riparian floodplains.'
+  },
+  {
     keywords: ['evacuate', 'evacuation', 'leave', 'escape'],
     answer: 'When an evacuation advisory is issued:\n• Pack only essential supplies (medication, documents, water).\n• Disconnect home utilities (power, gas, water main).\n• Follow designated evacuation corridors; avoid shortcuts near canals or culverts.\n• Register at your local designated evacuation shelter to enable tracking.'
   },
@@ -493,6 +509,21 @@ export const mockKnowledgeBase = [
     keywords: ['vehicle', 'car', 'driving', 'road'],
     answer: 'Rule of thumb: "Turn Around, Don\'t Drown."\n• More than half of flood-related fatalities occur in vehicles.\n• Just 30 cm (1 foot) of rushing water can sweep a passenger car away.\n• Hidden sinkholes, washed-out roads, and live electrical wires often lurk under murky floodwaters.'
   }
+];
+
+export const mockRiskDistribution = {
+  total: 48,
+  low: { count: 24, percent: 50 },
+  moderate: { count: 14, percent: 29 },
+  high: { count: 7, percent: 15 },
+  critical: { count: 3, percent: 6 }
+};
+
+export const mockEssentialSupplies = [
+  { category: 'Hydration & Food', items: ['Potable Water (3L/person/day for 3 days)', 'High-calorie non-perishable rations', 'Manual can opener & disposable utensils'] },
+  { category: 'Medical & Sanitation', items: ['7-day supply of prescription medications', 'First-aid kit (gauze, antiseptic, burn cream)', 'Water purification tablets & hand sanitizer'] },
+  { category: 'Power & Communication', items: ['Auxiliary 20,000mAh waterproof power bank', 'Battery-operated emergency radio', 'Heavy-duty LED flashlight & spare batteries'] },
+  { category: 'Safety & Documentation', items: ['High-pitch emergency rescue whistle', 'Airtight waterproof pouch for national IDs & deeds', 'Sturdy non-slip rubber boots & thermal emergency blankets'] }
 ];
 
 export const mockCapabilities = [

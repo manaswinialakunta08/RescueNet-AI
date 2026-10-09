@@ -6,8 +6,11 @@ import {
   Mail,
   Lock,
   ArrowRight,
-  CheckCircle2
+  CheckCircle2,
+  Eye,
+  EyeOff
 } from 'lucide-react';
+import SimulationBanner from '../components/SimulationBanner';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -17,6 +20,8 @@ export default function Register() {
     password: '',
     confirmPassword: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [registered, setRegistered] = useState(false);
 
@@ -70,7 +75,7 @@ export default function Register() {
       <div className="w-full max-w-5xl rounded-3xl bg-[#171925] backdrop-blur-xl border border-white/[0.08] shadow-[0_20px_50px_rgba(8,9,15,0.9)] overflow-hidden grid grid-cols-1 lg:grid-cols-12">
         {/* Left Split: Branding & Information */}
         <div className="lg:col-span-5 bg-gradient-to-br from-[#0D0F17] to-[#12141F] p-8 sm:p-10 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/[0.08] relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-60 h-60 rounded-full bg-[#8B5CF6]/15 blur-[80px] pointer-events-none" />
+          <div className="absolute top-0 right-0 w-60 h-60 rounded-full bg-[#8B5CF6]/15 blur-[80px] pointer-events-none" aria-hidden="true" />
 
           <div className="space-y-6 relative z-10">
             <div className="flex items-center gap-3">
@@ -111,11 +116,14 @@ export default function Register() {
 
         {/* Right Split: Register Form */}
         <div className="lg:col-span-7 p-8 sm:p-10 flex flex-col justify-center space-y-5">
-          <div>
-            <h2 className="text-2xl font-extrabold text-white tracking-tight font-mono">
-              Create Response Account
-            </h2>
-            <p className="text-xs text-[#A1A1AA] mt-1">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-extrabold text-white tracking-tight font-mono">
+                Create Response Account
+              </h2>
+              <SimulationBanner compact title="SIMULATED AUTH" variant="violet" />
+            </div>
+            <p className="text-xs text-[#A1A1AA]">
               Enter your details to register as an emergency operator.
             </p>
           </div>
@@ -131,17 +139,19 @@ export default function Register() {
               </p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-3.5">
+            <form onSubmit={handleSubmit} className="space-y-3.5" noValidate>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#A1A1AA] mb-1 font-mono">
+                <label htmlFor="reg-name" className="block text-xs font-semibold uppercase tracking-wider text-[#A1A1AA] mb-1 font-mono">
                   Full Name
                 </label>
                 <div className="relative">
                   <User
                     size={15}
                     className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#71717A]"
+                    aria-hidden="true"
                   />
                   <input
+                    id="reg-name"
                     type="text"
                     name="fullName"
                     value={formData.fullName}
@@ -156,15 +166,17 @@ export default function Register() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#A1A1AA] mb-1 font-mono">
+                <label htmlFor="reg-email" className="block text-xs font-semibold uppercase tracking-wider text-[#A1A1AA] mb-1 font-mono">
                   Email Address
                 </label>
                 <div className="relative">
                   <Mail
                     size={15}
                     className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#71717A]"
+                    aria-hidden="true"
                   />
                   <input
+                    id="reg-email"
                     type="email"
                     name="email"
                     value={formData.email}
@@ -180,22 +192,32 @@ export default function Register() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#A1A1AA] mb-1 font-mono">
+                  <label htmlFor="reg-password" className="block text-xs font-semibold uppercase tracking-wider text-[#A1A1AA] mb-1 font-mono">
                     Password
                   </label>
                   <div className="relative">
                     <Lock
                       size={15}
                       className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#71717A]"
+                      aria-hidden="true"
                     />
                     <input
-                      type="password"
+                      id="reg-password"
+                      type={showPassword ? 'text' : 'password'}
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="Min 6 chars"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#0D0F17] border border-white/10 text-white placeholder-[#71717A] text-xs focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6]/50 transition-all"
+                      className="w-full pl-10 pr-10 py-2.5 rounded-2xl bg-[#0D0F17] border border-white/10 text-white placeholder-[#71717A] text-xs focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6]/50 transition-all font-mono"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A] hover:text-[#A78BFA] transition-colors p-1"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                    </button>
                   </div>
                   {errors.password && (
                     <p className="text-[10px] text-[#FF4D6D] mt-1 font-mono">{errors.password}</p>
@@ -203,22 +225,32 @@ export default function Register() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#A1A1AA] mb-1 font-mono">
+                  <label htmlFor="reg-confirm-password" className="block text-xs font-semibold uppercase tracking-wider text-[#A1A1AA] mb-1 font-mono">
                     Confirm Password
                   </label>
                   <div className="relative">
                     <Lock
                       size={15}
                       className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#71717A]"
+                      aria-hidden="true"
                     />
                     <input
-                      type="password"
+                      id="reg-confirm-password"
+                      type={showConfirmPassword ? 'text' : 'password'}
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       placeholder="Re-enter password"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#0D0F17] border border-white/10 text-white placeholder-[#71717A] text-xs focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6]/50 transition-all"
+                      className="w-full pl-10 pr-10 py-2.5 rounded-2xl bg-[#0D0F17] border border-white/10 text-white placeholder-[#71717A] text-xs focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6]/50 transition-all font-mono"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A] hover:text-[#A78BFA] transition-colors p-1"
+                      aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showConfirmPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                    </button>
                   </div>
                   {errors.confirmPassword && (
                     <p className="text-[10px] text-[#FF4D6D] mt-1 font-mono">{errors.confirmPassword}</p>

@@ -1,11 +1,13 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import {
   CheckCircle2,
   Cpu,
   Clock,
   Sparkles,
   ArrowRight,
-  ShieldAlert
+  ShieldAlert,
+  LifeBuoy
 } from 'lucide-react';
 import RiskBadge from './RiskBadge';
 
@@ -36,14 +38,17 @@ export default function PredictionCard({ result, onReset }) {
   const gaugeColor = getGaugeColor(floodProbability);
 
   return (
-    <div className="rounded-3xl bg-[#171925] border border-white/[0.08] p-6 sm:p-8 space-y-7 shadow-[0_20px_50px_rgba(8,9,15,0.9)] relative overflow-hidden animate-drop-in">
+    <article
+      aria-label="Flood Risk Prediction Results"
+      className="rounded-3xl bg-[#171925] border border-white/[0.08] p-6 sm:p-8 space-y-7 shadow-[0_20px_50px_rgba(8,9,15,0.9)] relative overflow-hidden animate-drop-in"
+    >
       {/* Top Banner indicating Mock Data */}
       {isMock && (
         <div className="flex items-center justify-between flex-wrap gap-2 pb-4 border-b border-white/[0.08] text-xs">
           <div className="flex items-center gap-2 text-[#FB923C] font-mono">
             <span className="flex h-2 w-2 rounded-full bg-[#F97316] animate-pulse" />
             <span className="font-semibold uppercase tracking-wider text-[11px]">
-              DEMO RESULT — ML MODEL INTEGRATION PENDING
+              DEMO RESULT &bull; SIMULATED HYDROLOGICAL INFERENCE
             </span>
           </div>
           <span className="text-[#A1A1AA] font-mono text-[11px] bg-[#0D0F17] px-2.5 py-1 rounded-full border border-white/[0.08]">
@@ -56,7 +61,7 @@ export default function PredictionCard({ result, onReset }) {
       <div className="flex flex-col sm:flex-row items-center justify-between gap-6 p-6 rounded-2xl bg-[#0D0F17] border border-white/[0.08]">
         {/* SVG Radial Gauge */}
         <div className="relative flex items-center justify-center shrink-0">
-          <svg className="w-36 h-36 -rotate-90 transform" viewBox="0 0 130 130">
+          <svg className="w-36 h-36 -rotate-90 transform" viewBox="0 0 130 130" aria-label={`Calculated Flood Probability: ${floodProbability}%`}>
             <circle
               cx="65"
               cy="65"
@@ -151,6 +156,17 @@ export default function PredictionCard({ result, onReset }) {
         </div>
       </div>
 
+      {/* Result Interpretation Guide */}
+      <div className="rounded-2xl bg-[#0D0F17] border border-white/[0.08] p-4 text-xs space-y-1.5 text-[#A1A1AA]">
+        <div className="text-white font-mono font-bold text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+          <CheckCircle2 size={13} className="text-[#34D399]" />
+          <span>How to Interpret This Result</span>
+        </div>
+        <p className="text-[11px] leading-relaxed">
+          This probabilistic score estimates the likelihood of localized fluvial or pluvial inundation over a 3 to 6 hour horizon based on the 13 input features. Scores exceeding 65% (HIGH/CRITICAL) signal high probability of drainage surcharge and river channel overspill, triggering Stage 2/3 civil defense advisories.
+        </p>
+      </div>
+
       {/* Highlighted Operational Recommendation Panel */}
       <div className="rounded-2xl bg-[#F97316]/10 border border-[#F97316]/30 p-5 space-y-2">
         <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#FB923C] uppercase tracking-wider">
@@ -159,15 +175,26 @@ export default function PredictionCard({ result, onReset }) {
         </div>
         <p className="text-xs sm:text-sm text-[#F8FAFC] leading-relaxed">
           {recommendation ||
-            'Exercise caution and monitor local emergency guidance. Consider moving to a safer location if authorities issue evacuation instructions.'}
+            'Exercise caution and monitor local emergency guidance. Consider moving valuable assets and vulnerable residents to higher ground before drainage systems surcharge.'}
         </p>
+
+        <div className="pt-2">
+          <Link
+            to="/disaster-response"
+            className="inline-flex items-center gap-1.5 text-xs font-mono text-[#FB923C] hover:underline font-semibold"
+          >
+            <LifeBuoy size={13} />
+            <span>Open Standard Operating Protocols</span>
+            <ArrowRight size={13} />
+          </Link>
+        </div>
       </div>
 
       {/* Footer Details & Reset */}
       <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[#A1A1AA] border-t border-white/[0.08] font-mono">
         <div className="flex items-center gap-2 text-[11px]">
           <Clock size={13} className="text-[#71717A]" />
-          <span>Inference generated at: {new Date(timestamp).toLocaleTimeString()} IST</span>
+          <span>Inference timestamp: {new Date(timestamp).toLocaleTimeString()} IST</span>
         </div>
 
         {onReset && (
@@ -180,6 +207,6 @@ export default function PredictionCard({ result, onReset }) {
           </button>
         )}
       </div>
-    </div>
+    </article>
   );
 }

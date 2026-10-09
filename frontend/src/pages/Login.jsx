@@ -5,8 +5,11 @@ import {
   Mail,
   Lock,
   ArrowRight,
-  CheckCircle2
+  CheckCircle2,
+  Eye,
+  EyeOff
 } from 'lucide-react';
+import SimulationBanner from '../components/SimulationBanner';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -14,6 +17,7 @@ export default function Login() {
     email: '',
     password: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
 
@@ -66,7 +70,7 @@ export default function Login() {
       <div className="w-full max-w-5xl rounded-3xl bg-[#171925] backdrop-blur-xl border border-white/[0.08] shadow-[0_20px_50px_rgba(8,9,15,0.9)] overflow-hidden grid grid-cols-1 lg:grid-cols-12">
         {/* Left Split: Branding & Environmental Visual */}
         <div className="lg:col-span-5 bg-gradient-to-br from-[#0D0F17] to-[#12141F] p-8 sm:p-10 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/[0.08] relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-60 h-60 rounded-full bg-[#8B5CF6]/15 blur-[80px] pointer-events-none" />
+          <div className="absolute top-0 right-0 w-60 h-60 rounded-full bg-[#8B5CF6]/15 blur-[80px] pointer-events-none" aria-hidden="true" />
 
           <div className="space-y-6 relative z-10">
             <div className="flex items-center gap-3">
@@ -104,18 +108,21 @@ export default function Login() {
             </div>
 
             <p className="text-[10px] text-[#71717A] font-mono">
-              Phase 1 Client Prototype &bull; Spring Security in Phase 3
+              Phase 1 Client Prototype &bull; Spring Security & JWT in Phase 3
             </p>
           </div>
         </div>
 
         {/* Right Split: Login Form */}
         <div className="lg:col-span-7 p-8 sm:p-10 flex flex-col justify-center space-y-6">
-          <div>
-            <h2 className="text-2xl font-extrabold text-white tracking-tight font-mono">
-              Sign In to Station
-            </h2>
-            <p className="text-xs text-[#A1A1AA] mt-1">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-extrabold text-white tracking-tight font-mono">
+                Sign In to Station
+              </h2>
+              <SimulationBanner compact title="SIMULATED AUTH" variant="violet" />
+            </div>
+            <p className="text-xs text-[#A1A1AA]">
               Enter your credentials to access the risk telemetry matrix.
             </p>
           </div>
@@ -131,17 +138,19 @@ export default function Login() {
               </p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#A1A1AA] mb-1.5 font-mono">
+                <label htmlFor="login-email" className="block text-xs font-semibold uppercase tracking-wider text-[#A1A1AA] mb-1.5 font-mono">
                   Official Email Address
                 </label>
                 <div className="relative">
                   <Mail
                     size={15}
                     className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#71717A]"
+                    aria-hidden="true"
                   />
                   <input
+                    id="login-email"
                     type="email"
                     name="email"
                     value={formData.email}
@@ -156,22 +165,32 @@ export default function Login() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#A1A1AA] mb-1.5 font-mono">
+                <label htmlFor="login-password" className="block text-xs font-semibold uppercase tracking-wider text-[#A1A1AA] mb-1.5 font-mono">
                   Password
                 </label>
                 <div className="relative">
                   <Lock
                     size={15}
                     className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#71717A]"
+                    aria-hidden="true"
                   />
                   <input
-                    type="password"
+                    id="login-password"
+                    type={showPassword ? 'text' : 'password'}
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="••••••••••••"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#0D0F17] border border-white/10 text-white placeholder-[#71717A] text-xs focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6]/50 transition-all"
+                    className="w-full pl-10 pr-11 py-2.5 rounded-2xl bg-[#0D0F17] border border-white/10 text-white placeholder-[#71717A] text-xs focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6]/50 transition-all font-mono"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#71717A] hover:text-[#A78BFA] transition-colors p-1"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
                 </div>
                 {errors.password && (
                   <p className="text-[10px] text-[#FF4D6D] mt-1 font-mono">{errors.password}</p>
