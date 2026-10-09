@@ -4,11 +4,12 @@ import {
   Compass,
   AlertTriangle,
   CloudRain,
-  TrendingUp,
   Waves,
   Navigation,
-  ShieldAlert,
-  Search
+  Search,
+  ArrowRight,
+  Plus,
+  Minus
 } from 'lucide-react';
 import SectionTitle from '../components/SectionTitle';
 import RiskBadge from '../components/RiskBadge';
@@ -18,8 +19,8 @@ import { mockRiskLocations } from '../data/mockData';
 export default function RiskMap() {
   const [selectedLocation, setSelectedLocation] = useState(mockRiskLocations[0]);
   const [activeFilter, setActiveFilter] = useState('ALL');
-
   const [searchQuery, setSearchQuery] = useState('');
+  const [zoomLevel, setZoomLevel] = useState(1);
 
   const filteredLocations = mockRiskLocations.filter((loc) => {
     const matchesFilter = activeFilter === 'ALL' || loc.riskLevel === activeFilter;
@@ -43,7 +44,7 @@ export default function RiskMap() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 bg-[#F8FAFC]">
       {/* Page Title & Status Banner */}
       <div>
         <SectionTitle
@@ -51,24 +52,18 @@ export default function RiskMap() {
           title="Geographic Flood Risk Map"
           subtitle="Spatial hazard assessment across major river catchments and metropolitan floodplains in India."
         />
-
-        {/* Demo Disclaimer */}
-        <SimulationBanner
-          title="GEOSPATIAL SIMULATION MATRIX &bull; MOCK LOCATIONS"
-          message="Monitoring nodes and sensor readings are simulated representations of Indian river catchments. Live vector tiles, Doppler radar, and satellite precipitation overlays will be connected in subsequent phases."
-          variant="amber"
-        />
+        <SimulationBanner />
       </div>
 
       {/* Main Map + Detail Split */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Map Visual Console */}
-        <div className="lg:col-span-8 rounded-3xl bg-[#171925] backdrop-blur-xl border border-white/[0.08] p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden min-h-[560px]">
+        {/* Map Visual Console (8 cols) */}
+        <div className="lg:col-span-8 rounded-2xl bg-white border border-[#E5E7F0] p-6 shadow-sm flex flex-col justify-between min-h-[580px]">
           {/* Header Toolbar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/[0.08] text-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E5E7F0] text-xs">
             <div className="flex items-center gap-2">
-              <Compass size={16} className="text-[#A78BFA]" />
-              <span className="font-mono font-bold text-white uppercase text-[11px] tracking-wider">
+              <Compass size={16} className="text-[#7047E8]" />
+              <span className="font-bold text-[#17182B] text-xs">
                 India Spatial Matrix (8°N - 37°N, 68°E - 97°E)
               </span>
             </div>
@@ -76,268 +71,254 @@ export default function RiskMap() {
             <div className="flex items-center gap-2 flex-wrap">
               {/* Search Box */}
               <div className="relative">
-                <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#71717A]" />
+                <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#686B7D]" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search basin, city..."
-                  className="pl-7 pr-3 py-1 rounded-lg bg-[#0D0F17] border border-white/[0.08] text-white text-[11px] font-mono focus:outline-none focus:border-[#8B5CF6] placeholder:text-[#71717A] w-36 sm:w-44"
+                  className="pl-7 pr-3 py-1.5 rounded-xl bg-[#F8FAFC] border border-[#E5E7F0] text-[#17182B] text-xs focus:outline-none focus:border-[#7047E8] placeholder:text-[#686B7D] w-36 sm:w-44"
                 />
               </div>
 
               {/* Filter Pills */}
-              <div className="flex items-center gap-1 font-mono">
+              <div className="flex items-center gap-1">
                 {['ALL', 'CRITICAL', 'HIGH', 'MODERATE', 'LOW'].map((lvl) => (
                   <button
                     key={lvl}
                     onClick={() => setActiveFilter(lvl)}
-                    className={`px-2 py-1 rounded-lg text-[10px] transition-all cursor-pointer ${
+                    className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
                       activeFilter === lvl
-                        ? 'bg-gradient-to-r from-[#8B5CF6] to-[#C084FC] text-white font-bold shadow-[0_0_12px_rgba(139,92,246,0.4)]'
-                        : 'bg-[#0D0F17] text-[#A1A1AA] hover:text-white border border-white/[0.08]'
+                        ? 'bg-[#7047E8] text-white shadow-xs'
+                        : 'bg-[#F8FAFC] text-[#686B7D] hover:text-[#17182B] border border-[#E5E7F0]'
                     }`}
                   >
                     {lvl}
                   </button>
                 ))}
               </div>
+
+              {/* Zoom Controls */}
+              <div className="flex items-center gap-0.5 bg-[#F8FAFC] border border-[#E5E7F0] rounded-lg p-0.5">
+                <button
+                  onClick={() => setZoomLevel((z) => Math.min(z + 0.2, 1.6))}
+                  className="p-1 text-[#686B7D] hover:text-[#17182B] rounded hover:bg-white"
+                  title="Zoom In"
+                >
+                  <Plus size={13} />
+                </button>
+                <button
+                  onClick={() => setZoomLevel((z) => Math.max(z - 0.2, 0.8))}
+                  className="p-1 text-[#686B7D] hover:text-[#17182B] rounded hover:bg-white"
+                  title="Zoom Out"
+                >
+                  <Minus size={13} />
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Interactive Geographic Canvas */}
-          <div className="relative my-4 w-full h-[420px] sm:h-[500px] bg-[#0D0F17] rounded-2xl border border-white/[0.08] overflow-hidden flex items-center justify-center p-4">
-            {/* Grid Pattern */}
+          <div className="relative flex-1 my-4 min-h-[380px] bg-[#F3F4FA] rounded-xl border border-[#E5E7F0] overflow-hidden flex items-center justify-center">
+            {/* Background Map Grid */}
             <div
-              className="absolute inset-0 opacity-20 pointer-events-none"
-              aria-hidden="true"
-              style={{
-                backgroundImage:
-                  'radial-gradient(#8B5CF6 1px, transparent 1px), radial-gradient(#C084FC 1px, transparent 1px)',
-                backgroundSize: '28px 28px',
-                backgroundPosition: '0 0, 14px 14px'
-              }}
-            />
-
-            {/* Topography Silhouette SVG */}
-            <svg
-              viewBox="0 0 500 550"
-              className="w-full h-full max-w-[440px] max-h-[480px] opacity-25 stroke-[#8B5CF6] fill-[#12141F] pointer-events-none"
-              aria-label="Map Silhouette of India"
+              className="w-full h-full relative transition-transform duration-300"
+              style={{ transform: `scale(${zoomLevel})` }}
             >
-              <path
-                d="M 180,40 L 220,30 L 260,50 L 250,90 L 320,110 L 370,120 L 420,130 L 450,150 L 420,180 L 380,180 L 330,210 L 310,240 L 340,280 L 330,320 L 290,380 L 260,450 L 240,510 L 230,520 L 220,490 L 200,430 L 170,380 L 150,330 L 130,270 L 110,230 L 120,200 L 140,160 L 160,110 Z"
-                strokeWidth="1.5"
-                strokeDasharray="4 2"
-              />
-              <circle cx="250" cy="275" r="140" fill="none" stroke="#2E234D" strokeWidth="1" strokeDasharray="3 3" />
-              <circle cx="250" cy="275" r="210" fill="none" stroke="#2E234D" strokeWidth="1" strokeDasharray="3 3" />
-            </svg>
+              <svg viewBox="0 0 600 480" className="w-full h-full">
+                <defs>
+                  <pattern id="risk-grid" width="30" height="30" patternUnits="userSpaceOnUse">
+                    <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#E2E5F0" strokeWidth="0.8" />
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#risk-grid)" />
 
-            {/* Glowing Interactive Markers */}
-            {filteredLocations.map((loc) => {
-              const pos = getCoordinatesPercent(loc.lat, loc.lng);
-              const isSelected = selectedLocation?.id === loc.id;
-              const isCrit = loc.riskLevel === 'CRITICAL';
-              const isHigh = loc.riskLevel === 'HIGH';
+                {/* Stylized Indian Subcontinent Outline & River Networks */}
+                <path
+                  d="M 180,60 L 260,40 L 340,70 L 400,120 L 480,140 L 440,210 L 360,220 L 320,320 L 270,420 L 220,330 L 170,250 L 140,160 Z"
+                  fill="#FFFFFF"
+                  stroke="#D8DBEB"
+                  strokeWidth="2"
+                  opacity="0.9"
+                />
 
-              return (
-                <button
-                  key={loc.id}
-                  onClick={() => setSelectedLocation(loc)}
-                  style={{ top: pos.top, left: pos.left }}
-                  className={`absolute -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-20 focus:outline-none transition-transform duration-300 ${
-                    isSelected ? 'scale-125 z-30' : 'hover:scale-115'
-                  }`}
-                  title={`${loc.name} (${loc.riskLevel})`}
-                  aria-label={`Select station ${loc.name}, Threat level: ${loc.riskLevel}`}
-                >
-                  {(isCrit || isHigh) && (
-                    <span
-                      className={`absolute -inset-1.5 rounded-full animate-ping opacity-75 ${
-                        isCrit ? 'bg-[#FF4D6D]' : 'bg-[#F97316]'
-                      }`}
-                    />
-                  )}
+                {/* Major Rivers */}
+                <path
+                  d="M 220,90 Q 300,110 380,150 T 430,210"
+                  fill="none"
+                  stroke="#3478DB"
+                  strokeWidth="3.5"
+                  strokeOpacity="0.6"
+                />
+                <path
+                  d="M 170,220 Q 230,240 320,250 T 360,260"
+                  fill="none"
+                  stroke="#3478DB"
+                  strokeWidth="2.5"
+                  strokeOpacity="0.5"
+                />
+                <path
+                  d="M 190,290 Q 250,310 310,320"
+                  fill="none"
+                  stroke="#3478DB"
+                  strokeWidth="2.5"
+                  strokeOpacity="0.5"
+                />
+              </svg>
 
+              {/* Plotted Risk Nodes */}
+              {filteredLocations.map((loc) => {
+                const pos = getCoordinatesPercent(loc.lat, loc.lng);
+                const isSelected = selectedLocation?.id === loc.id;
+                const isHigh = loc.riskLevel === 'CRITICAL' || loc.riskLevel === 'HIGH';
+                const isMod = loc.riskLevel === 'MODERATE';
+
+                const dotColor = isHigh ? '#E5484D' : isMod ? '#E9A23B' : '#22A879';
+
+                return (
                   <div
-                    className={`relative px-2.5 py-1 rounded-lg border flex items-center gap-1.5 text-[10px] font-mono font-bold shadow-xl transition-all ${
-                      isCrit
-                        ? 'bg-[#FF4D6D] text-white border-white/30 shadow-[0_0_12px_rgba(255,77,109,0.5)]'
-                        : isHigh
-                        ? 'bg-[#F97316] text-white border-white/30 shadow-[0_0_12px_rgba(249,115,22,0.5)]'
-                        : loc.riskLevel === 'MODERATE'
-                        ? 'bg-[#FBBF24] text-slate-950 border-amber-200'
-                        : 'bg-[#34D399] text-slate-950 border-emerald-200'
-                    } ${isSelected ? 'ring-2 ring-white ring-offset-2 ring-offset-[#0D0F17]' : ''}`}
+                    key={loc.id}
+                    onClick={() => setSelectedLocation(loc)}
+                    style={{ top: pos.top, left: pos.left }}
+                    className="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer group z-10"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0" />
-                    <span>{loc.name}</span>
-                  </div>
-                </button>
-              );
-            })}
+                    {/* Ping ring for high/critical */}
+                    {isHigh && (
+                      <span
+                        className="absolute -inset-2 rounded-full opacity-40 animate-ping"
+                        style={{ backgroundColor: dotColor }}
+                      />
+                    )}
 
-            {/* HUD Coordinate Stamp */}
-            <div className="absolute bottom-3 left-3 bg-[#0D0F17]/90 border border-white/[0.08] p-2.5 rounded-xl text-[10px] font-mono text-[#71717A] space-y-0.5">
-              <div className="flex items-center gap-1.5 text-[#A78BFA]">
-                <Navigation size={11} />
-                <span>DATUM: WGS84 EPSG:4326</span>
+                    <div
+                      className={`w-6 h-6 rounded-full flex items-center justify-center transition-transform ${
+                        isSelected ? 'scale-125 ring-4 ring-[#7047E8]/30' : 'group-hover:scale-110'
+                      }`}
+                      style={{ backgroundColor: dotColor }}
+                    >
+                      <span className="w-2 h-2 rounded-full bg-white" />
+                    </div>
+
+                    {/* Node Hover Tooltip */}
+                    <div className="absolute left-1/2 -translate-x-1/2 bottom-8 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap bg-white border border-[#E5E7F0] p-2 rounded-xl shadow-md z-20">
+                      <div className="text-xs font-bold text-[#17182B]">{loc.name}</div>
+                      <div className="text-[10px] text-[#686B7D]">
+                        {loc.basin} &bull; {loc.probability}% Risk
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Bottom-Left Map Legend */}
+            <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md rounded-xl p-2.5 border border-[#E5E7F0] shadow-xs text-[10px] space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#E5484D]" />
+                <span className="font-bold text-[#17182B]">High / Critical (&gt;65%)</span>
               </div>
-              <div>LAT: 08°N &ndash; 37°N | LNG: 68°E &ndash; 97°E</div>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#E9A23B]" />
+                <span className="text-[#686B7D]">Moderate (35% - 65%)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#22A879]" />
+                <span className="text-[#686B7D]">Low (&lt;35%)</span>
+              </div>
             </div>
           </div>
 
-          {/* Map Footer Legend */}
-          <div className="pt-3 border-t border-white/[0.08] flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
-            <div className="flex items-center gap-4 flex-wrap text-[11px]">
-              <span className="text-[#A1A1AA] font-bold uppercase">Legend:</span>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#34D399]" />
-                <span className="text-[#A1A1AA]">Low (0-30%)</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#FBBF24]" />
-                <span className="text-[#A1A1AA]">Moderate (31-65%)</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#F97316]" />
-                <span className="text-[#A1A1AA]">High (66-85%)</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#FF4D6D] animate-pulse" />
-                <span className="text-[#A1A1AA]">Critical (&gt;85%)</span>
-              </div>
-            </div>
-
-            <span className="text-[11px] text-[#71717A]">
-              Showing {filteredLocations.length} monitored river basins
+          {/* Footer Coordinates Bar */}
+          <div className="pt-3 border-t border-[#E5E7F0] flex flex-wrap items-center justify-between text-xs text-[#686B7D]">
+            <span className="font-medium">
+              Showing {filteredLocations.length} monitored river basin stations
+            </span>
+            <span className="text-[#7047E8] font-bold">
+              Spatial Resolution: 0.1° (~11 km)
             </span>
           </div>
         </div>
 
-        {/* Selected Location Telemetry Sidebar */}
+        {/* Selected Station Telemetry Detail Card (4 cols) */}
         <div className="lg:col-span-4 space-y-6">
           {selectedLocation ? (
-            <div className="rounded-3xl bg-[#171925] backdrop-blur-xl border border-white/[0.08] p-6 shadow-2xl space-y-6 animate-fade-in-up">
-              {/* Header */}
-              <div className="flex items-start justify-between gap-2 pb-4 border-b border-white/[0.08]">
+            <div className="rounded-2xl bg-white border border-[#E5E7F0] p-6 shadow-sm space-y-5">
+              <div className="flex items-start justify-between pb-3 border-b border-[#E5E7F0]">
                 <div>
-                  <span className="text-[10px] font-mono uppercase text-[#A78BFA] tracking-wider block">
-                    {selectedLocation.state} &bull; {selectedLocation.id}
-                  </span>
-                  <h3 className="text-2xl font-extrabold text-white mt-0.5">
-                    {selectedLocation.name}
-                  </h3>
-                  <p className="text-xs text-[#A1A1AA]">{selectedLocation.basin}</p>
+                  <h3 className="text-base font-bold text-[#17182B]">{selectedLocation.name}</h3>
+                  <p className="text-xs text-[#686B7D]">{selectedLocation.state} &bull; {selectedLocation.basin}</p>
                 </div>
-                <RiskBadge level={selectedLocation.riskLevel} size="md" pulse={selectedLocation.riskLevel === 'CRITICAL'} />
+                <RiskBadge level={selectedLocation.riskLevel} size="md" />
               </div>
 
-              {/* Coordinates Pill */}
-              <div className="rounded-xl bg-[#0D0F17] border border-white/[0.08] p-3 text-xs font-mono text-[#A1A1AA] flex items-center justify-between">
-                <span>Geographic Datum:</span>
-                <span className="text-white">
-                  {selectedLocation.lat.toFixed(4)}°N, {selectedLocation.lng.toFixed(4)}°E
-                </span>
-              </div>
-
-              {/* 4 Sensor Gauges */}
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="rounded-2xl bg-[#0D0F17] border border-white/[0.08] p-3.5 space-y-1">
-                  <span className="text-[#A1A1AA] flex items-center gap-1 text-[11px]">
-                    <Waves size={13} className="text-[#8B5CF6]" /> Water Stage
+              {/* Gauge Probability Meter */}
+              <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E5E7F0] flex items-center justify-between">
+                <div>
+                  <span className="text-xs text-[#686B7D] block">Inundation Risk Probability</span>
+                  <span className="text-3xl font-extrabold text-[#17182B]">
+                    {selectedLocation.probability}%
                   </span>
-                  <p className="text-base font-bold text-white font-mono">
-                    {selectedLocation.waterLevel.toFixed(2)} m
-                  </p>
-                  <span className="text-[10px] text-[#71717A] font-mono">Gauge Depth</span>
                 </div>
-
-                <div className="rounded-2xl bg-[#0D0F17] border border-white/[0.08] p-3.5 space-y-1">
-                  <span className="text-[#A1A1AA] flex items-center gap-1 text-[11px]">
-                    <CloudRain size={13} className="text-[#C084FC]" /> Rainfall
-                  </span>
-                  <p className="text-base font-bold text-white font-mono">
-                    {selectedLocation.rainfall.toFixed(1)} mm
-                  </p>
-                  <span className="text-[10px] text-[#71717A] font-mono">24h Volume</span>
-                </div>
-
-                <div className="rounded-2xl bg-[#0D0F17] border border-white/[0.08] p-3.5 space-y-1">
-                  <span className="text-[#A1A1AA] flex items-center gap-1 text-[11px]">
-                    <TrendingUp size={13} className="text-[#FB923C]" /> Discharge
-                  </span>
-                  <p className="text-base font-bold text-white font-mono">
-                    {selectedLocation.discharge.toLocaleString()} m³/s
-                  </p>
-                  <span className="text-[10px] text-[#71717A] font-mono">Velocity</span>
-                </div>
-
-                <div className="rounded-2xl bg-[#0D0F17] border border-white/[0.08] p-3.5 space-y-1">
-                  <span className="text-[#A1A1AA] flex items-center gap-1 text-[11px]">
-                    <Compass size={13} className="text-[#A78BFA]" /> Elevation
-                  </span>
-                  <p className="text-base font-bold text-white font-mono">
-                    {selectedLocation.elevation} m
-                  </p>
-                  <span className="text-[10px] text-[#71717A] font-mono">Above MSL</span>
+                <div className="w-12 h-12 rounded-xl bg-[#F1EBFF] text-[#7047E8] flex items-center justify-center font-bold">
+                  <Navigation size={22} />
                 </div>
               </div>
 
-              {/* Advisory Box */}
-              <div className="rounded-2xl bg-[#F97316]/10 border border-[#F97316]/30 p-4 space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[#FB923C] font-mono uppercase">
-                  <AlertTriangle size={14} />
-                  <span>Regional Advisory Protocol</span>
+              {/* Station Sensors */}
+              <div className="space-y-2.5 text-xs">
+                <div className="flex justify-between items-center p-2.5 rounded-lg bg-[#F8FAFC]">
+                  <span className="text-[#686B7D] flex items-center gap-1.5">
+                    <CloudRain size={14} className="text-[#3478DB]" /> 24h Rainfall
+                  </span>
+                  <span className="font-bold text-[#17182B]">{selectedLocation.rainfall} mm</span>
                 </div>
-                <p className="text-xs text-[#F8FAFC] leading-relaxed">
-                  {selectedLocation.advisory}
+                <div className="flex justify-between items-center p-2.5 rounded-lg bg-[#F8FAFC]">
+                  <span className="text-[#686B7D] flex items-center gap-1.5">
+                    <Waves size={14} className="text-[#7047E8]" /> River Level
+                  </span>
+                  <span className="font-bold text-[#17182B]">{selectedLocation.waterLevel} m</span>
+                </div>
+                <div className="flex justify-between items-center p-2.5 rounded-lg bg-[#F8FAFC]">
+                  <span className="text-[#686B7D] flex items-center gap-1.5">
+                    <Compass size={14} className="text-[#22A879]" /> Coordinates
+                  </span>
+                  <span className="font-bold text-[#17182B]">{selectedLocation.lat}°N, {selectedLocation.lng}°E</span>
+                </div>
+              </div>
+
+              {/* Primary Hazard Description */}
+              <div className="p-3.5 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-xs space-y-1">
+                <div className="font-bold text-[#E5484D] flex items-center gap-1.5">
+                  <AlertTriangle size={14} /> Active Hazard Note
+                </div>
+                <p className="text-[#991B1B] text-[11px] leading-relaxed">
+                  {selectedLocation.hazardNote ||
+                    'Elevated streamflow and surface runoff exceeding seasonal safety limits. Continuous observation advised.'}
                 </p>
               </div>
 
-              {/* Action Button */}
-              <div>
+              {/* Actions */}
+              <div className="space-y-2 pt-2">
                 <Link
-                  to="/disaster-response"
-                  className="w-full py-3 rounded-2xl bg-gradient-to-r from-[#8B5CF6] to-[#C084FC] text-white font-bold text-xs uppercase tracking-wider font-mono flex items-center justify-center gap-2 transition-all shadow-md shadow-[#8B5CF6]/25 hover:shadow-[0_0_20px_rgba(139,92,246,0.4)]"
+                  to="/prediction"
+                  className="w-full py-2.5 px-4 rounded-xl bg-[#7047E8] hover:bg-[#5E35D1] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-colors"
                 >
-                  <ShieldAlert size={14} />
-                  <span>Emergency Protocols for {selectedLocation.name}</span>
+                  <span>Run Custom ML Prediction</span>
+                  <ArrowRight size={14} />
+                </Link>
+                <Link
+                  to="/response"
+                  className="w-full py-2.5 px-4 rounded-xl bg-white border border-[#E5E7F0] hover:bg-slate-50 text-[#17182B] text-xs font-bold flex items-center justify-center gap-2 transition-colors"
+                >
+                  <span>View Emergency Response Plan</span>
                 </Link>
               </div>
             </div>
           ) : (
-            <div className="rounded-3xl bg-[#171925] border border-white/[0.08] p-6 text-center text-[#A1A1AA] text-xs">
-              Select any regional station marker on the map to inspect telemetry.
+            <div className="p-8 text-center text-xs text-[#686B7D] bg-white rounded-2xl border border-[#E5E7F0]">
+              Select a monitoring node on the map to inspect telemetry
             </div>
           )}
-
-          {/* Quick List */}
-          <div className="rounded-3xl bg-[#171925] border border-white/[0.08] p-5 space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white font-mono">
-              Monitored River Corridors
-            </h4>
-            <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-              {mockRiskLocations.map((loc) => (
-                <button
-                  key={loc.id}
-                  onClick={() => setSelectedLocation(loc)}
-                  className={`w-full text-left p-2.5 rounded-xl border text-xs flex items-center justify-between transition-all cursor-pointer ${
-                    selectedLocation?.id === loc.id
-                      ? 'bg-[#0D0F17] border-[#8B5CF6]/60 text-white'
-                      : 'bg-[#0D0F17]/50 border-white/[0.08] text-[#A1A1AA] hover:bg-[#0D0F17]'
-                  }`}
-                >
-                  <div>
-                    <span className="font-semibold text-white">{loc.name}</span>
-                    <span className="text-[#71717A] ml-1.5 text-[11px]">({loc.basin})</span>
-                  </div>
-                  <RiskBadge level={loc.riskLevel} size="sm" showIcon={false} />
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>

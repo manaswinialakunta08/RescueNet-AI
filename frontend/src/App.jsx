@@ -28,17 +28,18 @@ export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
-      <div className="min-h-screen flex flex-col bg-[#08090F] text-[#F8FAFC] selection:bg-[#8B5CF6]/35 selection:text-white">
+      <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-[#17182B] selection:bg-[#7047E8]/20 selection:text-[#17182B]">
         <Navbar />
 
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/prediction" element={<Prediction />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/risk-map" element={<RiskMap />} />
+            <Route path="/response" element={<DisasterResponse />} />
             <Route path="/disaster-response" element={<DisasterResponse />} />
             <Route path="/ai-assistant" element={<AIAssistant />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/risk-map" element={<RiskMap />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             {/* Fallback route */}

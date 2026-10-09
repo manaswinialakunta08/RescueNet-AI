@@ -1,60 +1,41 @@
 import React from 'react';
 
 const ACCENT_STYLES = {
-  violet: {
-    iconBg: 'bg-[#8B5CF6]/15 border border-[#8B5CF6]/30',
-    iconColor: 'text-[#A78BFA]',
-    borderHover: 'hover:border-[#8B5CF6]/40',
-    glow: 'hover:shadow-[0_8px_25px_-5px_rgba(139,92,246,0.25)]'
-  },
   purple: {
-    iconBg: 'bg-[#C084FC]/15 border border-[#C084FC]/30',
-    iconColor: 'text-[#C084FC]',
-    borderHover: 'hover:border-[#C084FC]/40',
-    glow: 'hover:shadow-[0_8px_25px_-5px_rgba(192,132,252,0.25)]'
+    iconBg: 'bg-[#F1EBFF]',
+    iconColor: 'text-[#7047E8]'
   },
-  orange: {
-    iconBg: 'bg-[#F97316]/15 border border-[#F97316]/30',
-    iconColor: 'text-[#FB923C]',
-    borderHover: 'hover:border-[#F97316]/40',
-    glow: 'hover:shadow-[0_8px_25px_-5px_rgba(249,115,22,0.25)]'
+  violet: {
+    iconBg: 'bg-[#F1EBFF]',
+    iconColor: 'text-[#7047E8]'
   },
-  amber: {
-    iconBg: 'bg-[#FBBF24]/15 border border-[#FBBF24]/30',
-    iconColor: 'text-[#FBBF24]',
-    borderHover: 'hover:border-[#FBBF24]/40',
-    glow: 'hover:shadow-[0_8px_25px_-5px_rgba(251,191,36,0.25)]'
+  blue: {
+    iconBg: 'bg-[#3478DB]/10',
+    iconColor: 'text-[#3478DB]'
+  },
+  red: {
+    iconBg: 'bg-[#E5484D]/10',
+    iconColor: 'text-[#E5484D]'
   },
   rose: {
-    iconBg: 'bg-[#FF4D6D]/15 border border-[#FF4D6D]/30',
-    iconColor: 'text-[#FF4D6D]',
-    borderHover: 'hover:border-[#FF4D6D]/40',
-    glow: 'hover:shadow-[0_8px_25px_-5px_rgba(255,77,109,0.25)]'
+    iconBg: 'bg-[#E5484D]/10',
+    iconColor: 'text-[#E5484D]'
+  },
+  orange: {
+    iconBg: 'bg-[#E9A23B]/10',
+    iconColor: 'text-[#E9A23B]'
+  },
+  amber: {
+    iconBg: 'bg-[#E9A23B]/10',
+    iconColor: 'text-[#E9A23B]'
+  },
+  green: {
+    iconBg: 'bg-[#22A879]/10',
+    iconColor: 'text-[#22A879]'
   },
   emerald: {
-    iconBg: 'bg-[#34D399]/15 border border-[#34D399]/30',
-    iconColor: 'text-[#34D399]',
-    borderHover: 'hover:border-[#34D399]/40',
-    glow: 'hover:shadow-[0_8px_25px_-5px_rgba(52,211,153,0.25)]'
-  },
-  slate: {
-    iconBg: 'bg-[#1D2030] border border-white/10',
-    iconColor: 'text-[#A1A1AA]',
-    borderHover: 'hover:border-white/20',
-    glow: 'hover:shadow-[0_8px_20px_-5px_rgba(0,0,0,0.5)]'
-  },
-  // Compatibility mappings
-  teal: {
-    iconBg: 'bg-[#8B5CF6]/15 border border-[#8B5CF6]/30',
-    iconColor: 'text-[#A78BFA]',
-    borderHover: 'hover:border-[#8B5CF6]/40',
-    glow: 'hover:shadow-[0_8px_25px_-5px_rgba(139,92,246,0.25)]'
-  },
-  sky: {
-    iconBg: 'bg-[#C084FC]/15 border border-[#C084FC]/30',
-    iconColor: 'text-[#C084FC]',
-    borderHover: 'hover:border-[#C084FC]/40',
-    glow: 'hover:shadow-[0_8px_25px_-5px_rgba(192,132,252,0.25)]'
+    iconBg: 'bg-[#22A879]/10',
+    iconColor: 'text-[#22A879]'
   }
 };
 
@@ -66,43 +47,41 @@ export default function StatCard({
   trend,
   isPositiveTrend,
   icon: Icon,
-  accent = 'violet',
+  accent = 'purple',
   badge,
   className = ''
 }) {
-  const styles = ACCENT_STYLES[accent] || ACCENT_STYLES.violet;
+  const styles = ACCENT_STYLES[accent] || ACCENT_STYLES.purple;
 
   return (
     <div
-      className={`group relative rounded-2xl bg-[#171925] hover:bg-[#1D2030] backdrop-blur-md border border-white/[0.08] p-5 sm:p-6 transition-all duration-300 hover:-translate-y-1 ${styles.borderHover} ${styles.glow} ${className}`}
+      className={`group rounded-2xl bg-white border border-[#E5E7F0] p-5 transition-all duration-200 hover:shadow-md card-shadow ${className}`}
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="space-y-1.5">
-          <p className="text-[11px] font-mono tracking-wider uppercase text-[#A1A1AA]">{title}</p>
+        <div className="space-y-1">
+          <p className="text-xs font-medium text-[#686B7D]">{title}</p>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#F8FAFC] font-mono">{value}</span>
-            {unit && <span className="text-xs sm:text-sm font-medium text-[#71717A]">{unit}</span>}
+            <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#17182B]">{value}</span>
+            {unit && <span className="text-xs font-semibold text-[#686B7D]">{unit}</span>}
           </div>
         </div>
 
         {Icon && (
-          <div className={`rounded-xl p-2.5 shrink-0 transition-transform duration-300 group-hover:scale-110 ${styles.iconBg} ${styles.iconColor}`} aria-hidden="true">
+          <div className={`rounded-xl p-2.5 shrink-0 transition-transform group-hover:scale-105 ${styles.iconBg} ${styles.iconColor}`} aria-hidden="true">
             <Icon size={20} />
           </div>
         )}
       </div>
 
       {(subtitle || trend || badge) && (
-        <div className="mt-4 pt-3 border-t border-white/[0.08] flex items-center justify-between text-xs">
-          {subtitle && <span className="text-[#A1A1AA] truncate text-[11px]">{subtitle}</span>}
+        <div className="mt-3 pt-2.5 border-t border-[#E5E7F0]/60 flex items-center justify-between text-xs">
+          {subtitle && <span className="text-[#686B7D] truncate text-[11px]">{subtitle}</span>}
           {trend && (
             <span
-              className={`font-mono font-medium text-[11px] ${
-                isPositiveTrend === true
-                  ? 'text-[#34D399]'
-                  : isPositiveTrend === false
-                  ? 'text-[#FF4D6D]'
-                  : 'text-[#A1A1AA]'
+              className={`font-semibold text-[11px] ${
+                isPositiveTrend === false
+                  ? 'text-[#E5484D]'
+                  : 'text-[#22A879]'
               }`}
             >
               {trend}

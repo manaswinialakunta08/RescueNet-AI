@@ -3,682 +3,548 @@ import { Link } from 'react-router-dom';
 import {
   Activity,
   CloudRain,
-  TrendingUp,
-  AlertTriangle,
-  Search,
-  RefreshCw,
-  Thermometer,
-  Droplets,
   Waves,
+  ShieldAlert,
+  AlertTriangle,
+  RefreshCw,
   MapPin,
-  ExternalLink,
   Compass,
-  BrainCircuit,
-  LifeBuoy,
   ArrowRight,
-  ShieldAlert
+  Plus,
+  Minus
 } from 'lucide-react';
-import SectionTitle from '../components/SectionTitle';
 import StatCard from '../components/StatCard';
 import RiskBadge from '../components/RiskBadge';
-import SimulationBanner from '../components/SimulationBanner';
 import {
-  mockDashboardStats,
-  mockRecentPredictions,
-  mockTrendData,
-  mockRiskLocations,
-  mockRiskDistribution
+  mockRecentPredictions
 } from '../data/mockData';
 
 export default function Dashboard() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterRisk, setFilterRisk] = useState('ALL');
+  const [selectedLocation, setSelectedLocation] = useState('Hyderabad, Telangana');
+  const [timeRange, setTimeRange] = useState('7D');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
-    setTimeout(() => setIsRefreshing(false), 600);
+    setTimeout(() => setIsRefreshing(false), 500);
   };
 
-  const filteredPredictions = mockRecentPredictions.filter((item) => {
-    const matchesSearch =
-      item.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.state.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRisk = filterRisk === 'ALL' || item.riskLevel === filterRisk;
-    return matchesSearch && matchesRisk;
-  });
+  // 7 Days Trend Data
+  const rainfall7D = [45, 62, 88, 120, 185, 210, 248];
+  const waterLevel7D = [4.2, 4.8, 5.3, 5.9, 6.4, 6.9, 7.4];
+  const days7D = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      {/* Console Top Header & Operational Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 bg-[#F8FAFC]">
+      {/* ----------------- TOP CONTROLS & HEADER (Panel 5) ----------------- */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#E5E7F0]">
         <div>
-          <SectionTitle
-            badge="Telemetry Command Console"
-            title="Operational Intelligence Dashboard"
-            subtitle="Multi-station sensor ingestion, real-time basin telemetry, and predictive flood risk surveillance."
-            className="mb-0"
-          />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F1EBFF] text-[#7047E8] text-xs font-semibold mb-1.5">
+            <Activity size={13} />
+            <span>Hydrological Telemetry Hub</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#17182B] tracking-tight">
+            Flood Intelligence Dashboard
+          </h1>
+          <p className="text-xs sm:text-sm text-[#686B7D] mt-0.5">
+            Real-time hydrological monitoring and multi-basin predictive analytics.
+          </p>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
-          <SimulationBanner compact title="48 STATIONS SIMULATED" variant="violet" />
+        {/* Right Filter & Live Controls */}
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
+          {/* Location Select */}
+          <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[#E5E7F0] text-xs font-medium text-[#17182B] shadow-xs">
+            <MapPin size={14} className="text-[#7047E8]" />
+            <select
+              value={selectedLocation}
+              onChange={(e) => setSelectedLocation(e.target.value)}
+              className="bg-transparent outline-none cursor-pointer pr-2 font-semibold"
+            >
+              <option value="Hyderabad, Telangana">Hyderabad, Telangana</option>
+              <option value="Patna, Bihar">Patna, Bihar</option>
+              <option value="Mumbai, Maharashtra">Mumbai, Maharashtra</option>
+              <option value="Guwahati, Assam">Guwahati, Assam</option>
+            </select>
+          </div>
 
+          {/* Time Range Toggle */}
+          <div className="flex p-0.5 bg-white border border-[#E5E7F0] rounded-xl text-xs font-medium shadow-xs">
+            <button
+              onClick={() => setTimeRange('7D')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                timeRange === '7D'
+                  ? 'bg-[#7047E8] text-white font-bold'
+                  : 'text-[#686B7D] hover:text-[#17182B]'
+              }`}
+            >
+              7 Days
+            </button>
+            <button
+              onClick={() => setTimeRange('30D')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                timeRange === '30D'
+                  ? 'bg-[#7047E8] text-white font-bold'
+                  : 'text-[#686B7D] hover:text-[#17182B]'
+              }`}
+            >
+              30 Days
+            </button>
+          </div>
+
+          {/* Live Status Pill */}
+          <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#22A879] text-xs font-semibold">
+            <span className="w-2 h-2 rounded-full bg-[#22A879] animate-pulse" />
+            <span>Live Monitoring</span>
+          </div>
+
+          {/* Refresh Button */}
           <button
             onClick={handleRefresh}
-            className="p-2.5 rounded-xl bg-[#171925] hover:bg-[#1D2030] text-[#A1A1AA] hover:text-white border border-white/[0.08] transition-colors cursor-pointer"
-            title="Refresh Telemetry Feed"
-            aria-label="Refresh telemetry data"
+            className="p-2.5 rounded-xl bg-white hover:bg-slate-50 text-[#686B7D] hover:text-[#17182B] border border-[#E5E7F0] transition-colors shadow-xs"
+            title="Refresh telemetry"
           >
-            <RefreshCw size={15} className={isRefreshing ? 'animate-spin text-[#8B5CF6]' : ''} />
+            <RefreshCw size={15} className={isRefreshing ? 'animate-spin text-[#7047E8]' : ''} />
           </button>
         </div>
       </div>
 
-      {/* Operator Welcome & System Status Banner */}
-      <div className="rounded-2xl bg-gradient-to-r from-[#171925] via-[#12141F] to-[#171925] border border-white/[0.08] p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg">
-        <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-2xl bg-[#8B5CF6]/15 border border-[#8B5CF6]/30 flex items-center justify-center text-[#A78BFA] shrink-0">
-            <Activity size={22} />
-          </div>
-          <div>
-            <h2 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-              <span>Welcome back, Operator &bull; Operational Flood Intelligence Overview</span>
-            </h2>
-            <p className="text-xs text-[#A1A1AA] mt-0.5">
-              Continuous basin telemetry across 48 telemetry points. All metrics represent simulated environmental telemetry.
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 font-mono text-xs text-[#A1A1AA] shrink-0">
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#34D399]/10 border border-[#34D399]/20 text-[#34D399]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#34D399] animate-pulse" />
-            <span>Active Feed</span>
-          </div>
-          <span className="text-[#71717A]">Latency: 1.2s</span>
-        </div>
-      </div>
-
-      {/* ----------------- 1. STATS ROW ----------------- */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {/* ----------------- 4 STAT CARDS (Panel 5) ----------------- */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Current Threat Level"
-          value="HIGH"
-          icon={AlertTriangle}
-          accent="orange"
-          badge={<RiskBadge level="HIGH" size="sm" pulse />}
-          subtitle="Ganges & Mithi Basin Corridor"
-        />
-
-        <StatCard
-          title="Flood Probability"
-          value={mockDashboardStats.floodProbability}
-          unit="%"
-          icon={Activity}
-          accent="violet"
-          trend="+8% in past 6 hrs"
+          title="Rainfall (24h)"
+          value="248"
+          unit="mm"
+          trend="+18% from normal"
           isPositiveTrend={false}
-          subtitle="Model Consensus"
+          icon={CloudRain}
+          accent="blue"
         />
-
         <StatCard
-          title="Monitored Stations"
-          value={mockDashboardStats.activeStations}
-          unit="nodes"
-          icon={Compass}
+          title="Water Level"
+          value="7.4"
+          unit="m"
+          trend="+1.2m above danger"
+          isPositiveTrend={false}
+          icon={Waves}
           accent="purple"
-          subtitle="Indian Catchment Grid"
         />
-
         <StatCard
-          title="Model Confidence"
-          value={mockDashboardStats.modelConfidence}
+          title="Flood Risk"
+          value="82"
           unit="%"
-          icon={BrainCircuit}
-          accent="rose"
-          subtitle="XGBoost & Random Forest"
+          badge="High Risk"
+          icon={AlertTriangle}
+          accent="red"
+        />
+        <StatCard
+          title="Active Alerts"
+          value="3"
+          unit=""
+          trend="Immediate action required"
+          isPositiveTrend={false}
+          icon={ShieldAlert}
+          accent="amber"
         />
       </div>
 
-      {/* ----------------- 2. QUICK ACTIONS & RISK DISTRIBUTION ----------------- */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        {/* Risk Distribution Breakdown Card */}
-        <div className="lg:col-span-6 rounded-3xl bg-[#171925] border border-white/[0.08] p-6 space-y-4 shadow-xl">
-          <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
-            <div className="flex items-center gap-2">
-              <ShieldAlert size={16} className="text-[#C084FC]" />
-              <h3 className="text-sm font-bold text-white font-mono uppercase tracking-wider">
-                Risk Distribution (48 Stations)
-              </h3>
-            </div>
-            <span className="text-[11px] font-mono text-[#A1A1AA]">Current Cycle</span>
-          </div>
-
-          {/* Segmented Distribution Bar */}
-          <div className="space-y-2">
-            <div className="h-3 w-full rounded-full overflow-hidden flex bg-[#0D0F17] p-0.5 border border-white/[0.05]">
-              <div
-                style={{ width: `${mockRiskDistribution.low.percent}%` }}
-                className="bg-[#34D399] h-full rounded-l-full transition-all"
-                title={`Low: ${mockRiskDistribution.low.count} stations`}
-              />
-              <div
-                style={{ width: `${mockRiskDistribution.moderate.percent}%` }}
-                className="bg-[#FBBF24] h-full transition-all"
-                title={`Moderate: ${mockRiskDistribution.moderate.count} stations`}
-              />
-              <div
-                style={{ width: `${mockRiskDistribution.high.percent}%` }}
-                className="bg-[#F97316] h-full transition-all"
-                title={`High: ${mockRiskDistribution.high.count} stations`}
-              />
-              <div
-                style={{ width: `${mockRiskDistribution.critical.percent}%` }}
-                className="bg-[#FF4D6D] h-full rounded-r-full transition-all"
-                title={`Critical: ${mockRiskDistribution.critical.count} stations`}
-              />
-            </div>
-
-            {/* Legend Chips with Counts */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-xs font-mono">
-              <div className="p-2.5 rounded-xl bg-[#0D0F17] border border-white/[0.05]">
-                <div className="flex items-center gap-1.5 text-[#34D399]">
-                  <span className="w-2 h-2 rounded-full bg-[#34D399]" />
-                  <span className="font-bold">LOW</span>
-                </div>
-                <div className="text-base font-extrabold text-white mt-1">
-                  {mockRiskDistribution.low.count}
-                </div>
-                <span className="text-[10px] text-[#71717A]">{mockRiskDistribution.low.percent}%</span>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-[#0D0F17] border border-white/[0.05]">
-                <div className="flex items-center gap-1.5 text-[#FBBF24]">
-                  <span className="w-2 h-2 rounded-full bg-[#FBBF24]" />
-                  <span className="font-bold">MODERATE</span>
-                </div>
-                <div className="text-base font-extrabold text-white mt-1">
-                  {mockRiskDistribution.moderate.count}
-                </div>
-                <span className="text-[10px] text-[#71717A]">{mockRiskDistribution.moderate.percent}%</span>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-[#0D0F17] border border-white/[0.05]">
-                <div className="flex items-center gap-1.5 text-[#F97316]">
-                  <span className="w-2 h-2 rounded-full bg-[#F97316]" />
-                  <span className="font-bold">HIGH</span>
-                </div>
-                <div className="text-base font-extrabold text-white mt-1">
-                  {mockRiskDistribution.high.count}
-                </div>
-                <span className="text-[10px] text-[#71717A]">{mockRiskDistribution.high.percent}%</span>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-[#0D0F17] border border-white/[0.05]">
-                <div className="flex items-center gap-1.5 text-[#FF4D6D]">
-                  <span className="w-2 h-2 rounded-full bg-[#FF4D6D] animate-pulse" />
-                  <span className="font-bold">CRITICAL</span>
-                </div>
-                <div className="text-base font-extrabold text-white mt-1">
-                  {mockRiskDistribution.critical.count}
-                </div>
-                <span className="text-[10px] text-[#71717A]">{mockRiskDistribution.critical.percent}%</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Links / Operations Cards */}
-        <div className="lg:col-span-6 rounded-3xl bg-[#171925] border border-white/[0.08] p-6 space-y-4 shadow-xl flex flex-col justify-between">
-          <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
-            <h3 className="text-sm font-bold text-white font-mono uppercase tracking-wider flex items-center gap-2">
-              <Activity size={16} className="text-[#8B5CF6]" />
-              Platform Quick Actions
-            </h3>
-            <span className="text-[11px] font-mono text-[#A1A1AA]">Direct Access</span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Link
-              to="/prediction"
-              className="p-3.5 rounded-2xl bg-[#0D0F17] hover:bg-[#1D2030] border border-white/[0.08] hover:border-[#8B5CF6]/40 transition-all flex flex-col justify-between group"
-            >
-              <div>
-                <div className="w-8 h-8 rounded-xl bg-[#8B5CF6]/15 text-[#A78BFA] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
-                  <BrainCircuit size={16} />
-                </div>
-                <h4 className="text-xs font-bold text-white group-hover:text-[#A78BFA] transition-colors">
-                  Run Prediction
-                </h4>
-                <p className="text-[11px] text-[#A1A1AA] mt-1">
-                  Simulate 13 environmental features.
-                </p>
-              </div>
-              <div className="mt-3 flex items-center gap-1 text-[11px] font-mono text-[#8B5CF6]">
-                <span>Launch</span>
-                <ArrowRight size={11} className="group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
-
-            <Link
-              to="/risk-map"
-              className="p-3.5 rounded-2xl bg-[#0D0F17] hover:bg-[#1D2030] border border-white/[0.08] hover:border-[#8B5CF6]/40 transition-all flex flex-col justify-between group"
-            >
-              <div>
-                <div className="w-8 h-8 rounded-xl bg-[#C084FC]/15 text-[#C084FC] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
-                  <MapPin size={16} />
-                </div>
-                <h4 className="text-xs font-bold text-white group-hover:text-[#A78BFA] transition-colors">
-                  Geospatial Map
-                </h4>
-                <p className="text-[11px] text-[#A1A1AA] mt-1">
-                  Explore 8 river basins across India.
-                </p>
-              </div>
-              <div className="mt-3 flex items-center gap-1 text-[11px] font-mono text-[#C084FC]">
-                <span>View Map</span>
-                <ArrowRight size={11} className="group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
-
-            <Link
-              to="/disaster-response"
-              className="p-3.5 rounded-2xl bg-[#0D0F17] hover:bg-[#1D2030] border border-white/[0.08] hover:border-[#F97316]/40 transition-all flex flex-col justify-between group"
-            >
-              <div>
-                <div className="w-8 h-8 rounded-xl bg-[#F97316]/15 text-[#FB923C] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
-                  <LifeBuoy size={16} />
-                </div>
-                <h4 className="text-xs font-bold text-white group-hover:text-[#FB923C] transition-colors">
-                  Response SOPs
-                </h4>
-                <p className="text-[11px] text-[#A1A1AA] mt-1">
-                  8-point checklist and NDRF directory.
-                </p>
-              </div>
-              <div className="mt-3 flex items-center gap-1 text-[11px] font-mono text-[#FB923C]">
-                <span>Directives</span>
-                <ArrowRight size={11} className="group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* ----------------- 3. TREND CHART & TELEMETRY GAUGES ----------------- */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-        {/* Trend Area with SVG Visual Chart */}
-        <div className="lg:col-span-8 rounded-3xl bg-[#171925] backdrop-blur-md border border-white/[0.08] p-6 sm:p-8 flex flex-col justify-between shadow-2xl">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#8B5CF6]" />
-                <h3 className="text-sm sm:text-base font-bold text-white uppercase tracking-wider font-mono">
-                  24-Hour Inundation Probability & Precipitation Trend
-                </h3>
-              </div>
-              <p className="text-xs text-[#A1A1AA] mt-1">
-                Hydro-metric sensor readings plotted across 4-hour monitoring cycles.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-4 text-xs font-mono">
-              <span className="flex items-center gap-1.5 text-[#A78BFA]">
-                <span className="w-3 h-0.5 bg-[#8B5CF6]" /> Probability (%)
-              </span>
-              <span className="flex items-center gap-1.5 text-[#FB923C]">
-                <span className="w-3 h-0.5 bg-[#F97316]" /> Rainfall (mm)
-              </span>
-            </div>
-          </div>
-
-          {/* Responsive SVG Chart */}
-          <div className="w-full bg-[#0D0F17] rounded-2xl p-4 border border-white/[0.08]">
-            <svg
-              viewBox="0 0 600 220"
-              className="w-full h-48 sm:h-56 overflow-visible"
-              preserveAspectRatio="none"
-              aria-label="24-Hour Flood Probability and Precipitation Line Chart"
-            >
-              <defs>
-                <linearGradient id="probGradientDash" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.45" />
-                  <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0.0" />
-                </linearGradient>
-              </defs>
-
-              {/* Grid Lines */}
-              <line x1="40" y1="20" x2="580" y2="20" stroke="#2E234D" strokeDasharray="3 3" opacity="0.6" />
-              <line x1="40" y1="70" x2="580" y2="70" stroke="#2E234D" strokeDasharray="3 3" opacity="0.6" />
-              <line x1="40" y1="120" x2="580" y2="120" stroke="#2E234D" strokeDasharray="3 3" opacity="0.6" />
-              <line x1="40" y1="170" x2="580" y2="170" stroke="#2E234D" strokeDasharray="3 3" opacity="0.6" />
-
-              {/* Y Axis Labels */}
-              <text x="30" y="24" fill="#71717A" fontSize="10" textAnchor="end" fontFamily="monospace">100%</text>
-              <text x="30" y="74" fill="#71717A" fontSize="10" textAnchor="end" fontFamily="monospace">75%</text>
-              <text x="30" y="124" fill="#71717A" fontSize="10" textAnchor="end" fontFamily="monospace">50%</text>
-              <text x="30" y="174" fill="#71717A" fontSize="10" textAnchor="end" fontFamily="monospace">25%</text>
-
-              {/* Area Under Curve */}
-              <polygon
-                points="40,170 40,130 130,116 220,98 310,72 400,56 490,50 580,62 580,170"
-                fill="url(#probGradientDash)"
-              />
-
-              {/* Probability Curve */}
-              <polyline
-                fill="none"
-                stroke="#8B5CF6"
-                strokeWidth="3"
-                points="40,130 130,116 220,98 310,72 400,56 490,50 580,62"
-                style={{ filter: 'drop-shadow(0 0 6px rgba(139, 92, 246, 0.6))' }}
-              />
-
-              {/* Rainfall Bars (Secondary Visual) */}
-              {[
-                { x: 40, h: 25 },
-                { x: 130, h: 38 },
-                { x: 220, h: 58 },
-                { x: 310, h: 86 },
-                { x: 400, h: 104 },
-                { x: 490, h: 114 },
-                { x: 580, h: 96 }
-              ].map((bar, i) => (
-                <rect
-                  key={i}
-                  x={bar.x - 7}
-                  y={170 - bar.h}
-                  width="14"
-                  height={bar.h}
-                  fill="#F97316"
-                  opacity="0.3"
-                  rx="3"
-                />
-              ))}
-
-              {/* Data Points on Probability Line */}
-              {[
-                { cx: 40, cy: 130, label: '45%' },
-                { cx: 130, cy: 116, label: '52%' },
-                { cx: 220, cy: 98, label: '61%' },
-                { cx: 310, cy: 72, label: '74%' },
-                { cx: 400, cy: 56, label: '82%' },
-                { cx: 490, cy: 50, label: '85%' },
-                { cx: 580, cy: 62, label: '79%' }
-              ].map((pt, i) => (
-                <g key={i}>
-                  <circle cx={pt.cx} cy={pt.cy} r="4" fill="#F8FAFC" stroke="#8B5CF6" strokeWidth="2.5" />
-                  <text
-                    x={pt.cx}
-                    y={pt.cy - 10}
-                    fill="#F8FAFC"
-                    fontSize="9"
-                    textAnchor="middle"
-                    fontFamily="monospace"
-                    fontWeight="bold"
-                  >
-                    {pt.label}
-                  </text>
-                </g>
-              ))}
-
-              {/* X Axis Time Labels */}
-              {mockTrendData.map((d, i) => {
-                const xCoord = 40 + i * 90;
-                return (
-                  <text
-                    key={i}
-                    x={xCoord}
-                    y="195"
-                    fill="#71717A"
-                    fontSize="10"
-                    textAnchor="middle"
-                    fontFamily="monospace"
-                  >
-                    {d.time.split(' ')[0]}
-                  </text>
-                );
-              })}
-            </svg>
-          </div>
-
-          <div className="mt-4 flex flex-wrap items-center justify-between text-[11px] font-mono text-[#A1A1AA] pt-3 border-t border-white/[0.08]">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#FF4D6D] animate-ping" />
-              <span>Critical threshold reached at 16:00 IST (82% probability)</span>
-            </span>
-            <span className="text-[#71717A]">Sampling interval: 4.0 hrs</span>
-          </div>
-        </div>
-
-        {/* Environmental Indicators Column */}
-        <div className="lg:col-span-4 rounded-3xl bg-[#171925] border border-white/[0.08] p-6 sm:p-8 flex flex-col justify-between shadow-2xl">
-          <div className="space-y-4">
-            <div className="pb-3 border-b border-white/[0.08] flex items-center justify-between">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
-                Telemetry Vectors
-              </h3>
-              <span className="text-[10px] font-mono text-[#34D399]">Live Status</span>
-            </div>
-
-            <div className="space-y-3">
-              <div className="p-3.5 rounded-2xl bg-[#0D0F17] border border-white/[0.08] flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-[#8B5CF6]/15 text-[#A78BFA]">
-                    <CloudRain size={16} />
-                  </div>
-                  <div>
-                    <span className="text-xs font-semibold text-white block">Precipitation (24h)</span>
-                    <span className="text-[10px] text-[#71717A] font-mono">Peak Monsoon Rain</span>
-                  </div>
-                </div>
-                <span className="font-mono font-bold text-[#A78BFA] text-sm">174.2 mm</span>
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-[#0D0F17] border border-white/[0.08] flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-[#F97316]/15 text-[#FB923C]">
-                    <TrendingUp size={16} />
-                  </div>
-                  <div>
-                    <span className="text-xs font-semibold text-white block">Discharge Rate</span>
-                    <span className="text-[10px] text-[#71717A] font-mono">Surface Runoff</span>
-                  </div>
-                </div>
-                <span className="font-mono font-bold text-[#FB923C] text-sm">3,410 m³/s</span>
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-[#0D0F17] border border-white/[0.08] flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-[#FBBF24]/15 text-[#FBBF24]">
-                    <Waves size={16} />
-                  </div>
-                  <div>
-                    <span className="text-xs font-semibold text-white block">River Water Level</span>
-                    <span className="text-[10px] text-[#71717A] font-mono">Channel Stage</span>
-                  </div>
-                </div>
-                <span className="font-mono font-bold text-[#FBBF24] text-sm">7.85 m</span>
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-[#0D0F17] border border-white/[0.08] flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-[#34D399]/15 text-[#34D399]">
-                    <Thermometer size={16} />
-                  </div>
-                  <div>
-                    <span className="text-xs font-semibold text-white block">Temperature</span>
-                    <span className="text-[10px] text-[#71717A] font-mono">Ambient Temp</span>
-                  </div>
-                </div>
-                <span className="font-mono font-bold text-white text-sm">27.8 °C</span>
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-[#0D0F17] border border-white/[0.08] flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-[#C084FC]/15 text-[#C084FC]">
-                    <Droplets size={16} />
-                  </div>
-                  <div>
-                    <span className="text-xs font-semibold text-white block">Humidity</span>
-                    <span className="text-[10px] text-[#71717A] font-mono">Atmospheric Saturation</span>
-                  </div>
-                </div>
-                <span className="font-mono font-bold text-white text-sm">89.4 %</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-4 border-t border-white/[0.08]">
-            <Link
-              to="/prediction"
-              className="w-full py-3 rounded-2xl bg-[#0D0F17] hover:bg-[#1D2030] border border-white/[0.08] text-white font-bold text-xs uppercase tracking-wider font-mono flex items-center justify-center gap-2 transition-all"
-            >
-              <BrainCircuit size={14} className="text-[#A78BFA]" />
-              <span>Simulate Custom Vector</span>
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* ----------------- 4. INFERENCE LOG & REGIONAL MATRIX ----------------- */}
+      {/* ----------------- 2-COLUMN MAIN CONTENT ----------------- */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Recent Inferences Table */}
-        <div className="lg:col-span-8 rounded-3xl bg-[#171925] border border-white/[0.08] p-6 sm:p-8 space-y-5 shadow-2xl">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
-            <div>
-              <h3 className="text-sm sm:text-base font-bold text-white font-mono uppercase tracking-wider">
-                Recent Model Inferences
-              </h3>
-              <p className="text-xs text-[#A1A1AA]">
-                Validated prediction outputs stored in simulated operational telemetry cache.
-              </p>
-            </div>
-
-            {/* Filter & Search Bar */}
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717A]" />
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Filter station..."
-                  className="pl-8 pr-3 py-1.5 rounded-xl bg-[#0D0F17] border border-white/10 text-white text-xs font-mono placeholder:text-[#71717A] focus:outline-none focus:border-[#8B5CF6] w-36 sm:w-48"
-                />
+        {/* Left Column: Flood Risk Map + Trends (7 cols) */}
+        <div className="lg:col-span-7 space-y-6">
+          {/* Card 1: Flood Risk Map (Panel 5) */}
+          <div className="rounded-2xl bg-white border border-[#E5E7F0] p-5 shadow-sm">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E5E7F0] mb-3">
+              <div className="flex items-center gap-2">
+                <MapPin size={16} className="text-[#7047E8]" />
+                <h3 className="font-bold text-sm text-[#17182B]">
+                  Hyderabad Flood Risk Map
+                </h3>
+                <span className="text-[10px] bg-[#ECFDF5] text-[#22A879] font-medium px-2 py-0.5 rounded-full border border-[#A7F3D0]">
+                  Station Node #4
+                </span>
               </div>
 
-              <select
-                value={filterRisk}
-                onChange={(e) => setFilterRisk(e.target.value)}
-                className="px-3 py-1.5 rounded-xl bg-[#0D0F17] border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-[#8B5CF6]"
+              {/* Map Zoom Controls */}
+              <div className="flex items-center gap-1 bg-[#F8FAFC] border border-[#E5E7F0] rounded-lg p-0.5">
+                <button
+                  onClick={() => setZoomLevel((z) => Math.min(z + 0.2, 1.6))}
+                  className="p-1 text-[#686B7D] hover:text-[#17182B] rounded hover:bg-white"
+                  title="Zoom In"
+                >
+                  <Plus size={13} />
+                </button>
+                <button
+                  onClick={() => setZoomLevel((z) => Math.max(z - 0.2, 0.8))}
+                  className="p-1 text-[#686B7D] hover:text-[#17182B] rounded hover:bg-white"
+                  title="Zoom Out"
+                >
+                  <Minus size={13} />
+                </button>
+              </div>
+            </div>
+
+            {/* Stylized SVG Map Display */}
+            <div className="relative h-72 rounded-xl bg-[#F3F4FA] border border-[#E5E7F0] overflow-hidden flex items-center justify-center">
+              <div
+                className="w-full h-full transition-transform duration-300"
+                style={{ transform: `scale(${zoomLevel})` }}
               >
-                <option value="ALL">All Tiers</option>
-                <option value="CRITICAL">Critical</option>
-                <option value="HIGH">High</option>
-                <option value="MODERATE">Moderate</option>
-                <option value="LOW">Low</option>
-              </select>
+                <svg viewBox="0 0 500 320" className="w-full h-full">
+                  <defs>
+                    <pattern id="dash-grid" width="28" height="28" patternUnits="userSpaceOnUse">
+                      <path d="M 28 0 L 0 0 0 28" fill="none" stroke="#E2E5F0" strokeWidth="0.8" />
+                    </pattern>
+                    <radialGradient id="dash-heat-high" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="#E5484D" stopOpacity="0.75" />
+                      <stop offset="60%" stopColor="#E9A23B" stopOpacity="0.35" />
+                      <stop offset="100%" stopColor="#FDE68A" stopOpacity="0" />
+                    </radialGradient>
+                    <radialGradient id="dash-heat-mod" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="#E9A23B" stopOpacity="0.6" />
+                      <stop offset="100%" stopColor="#FDE68A" stopOpacity="0" />
+                    </radialGradient>
+                    <radialGradient id="dash-heat-low" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="#22A879" stopOpacity="0.5" />
+                      <stop offset="100%" stopColor="#A7F3D0" stopOpacity="0" />
+                    </radialGradient>
+                  </defs>
+
+                  <rect width="100%" height="100%" fill="url(#dash-grid)" />
+
+                  {/* Road Network */}
+                  <path d="M 0,70 Q 250,90 500,80" fill="none" stroke="#D8DBEB" strokeWidth="2" />
+                  <path d="M 0,230 Q 250,210 500,240" fill="none" stroke="#D8DBEB" strokeWidth="2" />
+                  <path d="M 130,0 Q 150,160 140,320" fill="none" stroke="#D8DBEB" strokeWidth="2" />
+                  <path d="M 370,0 Q 350,160 380,320" fill="none" stroke="#D8DBEB" strokeWidth="2" />
+
+                  {/* Musi River */}
+                  <path
+                    d="M 20,270 C 130,250 190,160 270,170 C 350,180 430,120 480,100"
+                    fill="none"
+                    stroke="#3478DB"
+                    strokeWidth="8"
+                    strokeOpacity="0.45"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M 20,270 C 130,250 190,160 270,170 C 350,180 430,120 480,100"
+                    fill="none"
+                    stroke="#7047E8"
+                    strokeWidth="2.5"
+                    strokeDasharray="6 4"
+                  />
+
+                  {/* Heatmap zones */}
+                  <circle cx="120" cy="100" r="50" fill="url(#dash-heat-low)" />
+                  <circle cx="120" cy="100" r="4" fill="#22A879" />
+                  <text x="130" y="104" fontSize="10" fontWeight="600" fill="#22A879">Secunderabad</text>
+
+                  <circle cx="390" cy="200" r="60" fill="url(#dash-heat-mod)" />
+                  <circle cx="390" cy="200" r="4" fill="#E9A23B" />
+                  <text x="320" y="204" fontSize="10" fontWeight="600" fill="#E9A23B">LB Nagar</text>
+
+                  {/* High Risk Core */}
+                  <circle cx="260" cy="165" r="75" fill="url(#dash-heat-high)" />
+                  <circle cx="260" cy="165" r="14" fill="#E5484D" fillOpacity="0.25" className="animate-ping" />
+                  <circle cx="260" cy="165" r="6" fill="#E5484D" />
+                  <text x="215" y="145" fontSize="11" fontWeight="700" fill="#E5484D">Central Basin</text>
+
+                  <g transform="translate(260, 165)">
+                    <rect x="-42" y="10" width="84" height="20" rx="4" fill="#17182B" />
+                    <text x="0" y="23" textAnchor="middle" fontSize="9" fontWeight="bold" fill="#FFFFFF">
+                      82% Flood Risk
+                    </text>
+                  </g>
+                </svg>
+              </div>
+
+              {/* Floating Map Legend Tag */}
+              <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md rounded-xl p-2.5 border border-[#E5E7F0] shadow-xs text-[10px] space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#E5484D]" />
+                  <span className="font-bold text-[#17182B]">High Risk (&gt;65%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#E9A23B]" />
+                  <span className="text-[#686B7D]">Moderate (35-65%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#22A879]" />
+                  <span className="text-[#686B7D]">Low (&lt;35%)</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom status */}
+            <div className="flex items-center justify-between pt-3 text-xs text-[#686B7D]">
+              <span className="flex items-center gap-1.5 font-medium">
+                <Compass size={14} className="text-[#7047E8]" />
+                Sensor Grid: 17.3850° N, 78.4867° E
+              </span>
+              <Link to="/prediction" className="text-[#7047E8] font-bold hover:underline flex items-center gap-1">
+                Run Simulation <ArrowRight size={13} />
+              </Link>
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            {filteredPredictions.length === 0 ? (
-              <div className="text-center py-10 space-y-2">
-                <p className="text-sm font-medium text-[#F8FAFC]">No inferences found</p>
-                <p className="text-xs text-[#71717A]">Try adjusting your search query or threat level filter.</p>
+          {/* Card 2: Rainfall Trend Area Chart (Panel 5) */}
+          <div className="rounded-2xl bg-white border border-[#E5E7F0] p-5 shadow-sm">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E5E7F0] mb-4">
+              <div>
+                <h3 className="font-bold text-sm text-[#17182B]">Rainfall Trend (24h Accumulation)</h3>
+                <p className="text-xs text-[#686B7D]">Past 7-day precipitation volume curve</p>
               </div>
-            ) : (
-              <table className="w-full text-left text-xs border-collapse">
+              <span className="text-xs font-bold text-[#3478DB] bg-[#3478DB]/10 px-2.5 py-1 rounded-lg">
+                Peak: 248 mm
+              </span>
+            </div>
+
+            {/* SVG Area Chart */}
+            <div className="h-44 w-full">
+              <svg viewBox="0 0 500 160" className="w-full h-full">
+                <defs>
+                  <linearGradient id="rainGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#3478DB" stopOpacity="0.35" />
+                    <stop offset="100%" stopColor="#3478DB" stopOpacity="0.02" />
+                  </linearGradient>
+                </defs>
+
+                {/* Grid horizontal lines */}
+                <line x1="40" y1="20" x2="490" y2="20" stroke="#E5E7F0" strokeWidth="1" strokeDasharray="3 3" />
+                <line x1="40" y1="60" x2="490" y2="60" stroke="#E5E7F0" strokeWidth="1" strokeDasharray="3 3" />
+                <line x1="40" y1="100" x2="490" y2="100" stroke="#E5E7F0" strokeWidth="1" strokeDasharray="3 3" />
+                <line x1="40" y1="140" x2="490" y2="140" stroke="#E5E7F0" strokeWidth="1" />
+
+                {/* Y Axis labels */}
+                <text x="32" y="24" fontSize="9" fill="#686B7D" textAnchor="end">250mm</text>
+                <text x="32" y="64" fontSize="9" fill="#686B7D" textAnchor="end">150mm</text>
+                <text x="32" y="104" fontSize="9" fill="#686B7D" textAnchor="end">50mm</text>
+
+                {/* Path area */}
+                <path
+                  d="M 50,130 L 115,115 L 180,95 L 245,75 L 310,40 L 375,30 L 440,15 L 440,140 L 50,140 Z"
+                  fill="url(#rainGrad)"
+                />
+                <path
+                  d="M 50,130 L 115,115 L 180,95 L 245,75 L 310,40 L 375,30 L 440,15"
+                  fill="none"
+                  stroke="#3478DB"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+
+                {/* Points */}
+                {rainfall7D.map((val, i) => {
+                  const cx = 50 + i * 65;
+                  const cy = 140 - (val / 260) * 125;
+                  return (
+                    <g key={i}>
+                      <circle cx={cx} cy={cy} r="3.5" fill="#3478DB" />
+                      <text x={cx} y="153" fontSize="9" fill="#686B7D" textAnchor="middle">
+                        {days7D[i]}
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
+            </div>
+          </div>
+
+          {/* Card 3: Water Level Trend Area Chart (Panel 5) */}
+          <div className="rounded-2xl bg-white border border-[#E5E7F0] p-5 shadow-sm">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E5E7F0] mb-4">
+              <div>
+                <h3 className="font-bold text-sm text-[#17182B]">Water Level Trend</h3>
+                <p className="text-xs text-[#686B7D]">Musi River gauge height vs. danger mark (6.2m)</p>
+              </div>
+              <span className="text-xs font-bold text-[#E5484D] bg-[#FEF2F2] border border-[#FECACA] px-2.5 py-1 rounded-lg">
+                Current: 7.4 m (Hazard)
+              </span>
+            </div>
+
+            {/* SVG Area Chart */}
+            <div className="h-44 w-full">
+              <svg viewBox="0 0 500 160" className="w-full h-full">
+                <defs>
+                  <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#7047E8" stopOpacity="0.35" />
+                    <stop offset="100%" stopColor="#7047E8" stopOpacity="0.02" />
+                  </linearGradient>
+                </defs>
+
+                {/* Red Danger Mark Line */}
+                <line x1="40" y1="55" x2="490" y2="55" stroke="#E5484D" strokeWidth="1.5" strokeDasharray="4 4" />
+                <text x="480" y="50" fontSize="8" fontWeight="bold" fill="#E5484D" textAnchor="end">
+                  Danger Level (6.2m)
+                </text>
+
+                {/* Y Axis labels */}
+                <text x="32" y="24" fontSize="9" fill="#686B7D" textAnchor="end">8.0m</text>
+                <text x="32" y="58" fontSize="9" fill="#E5484D" textAnchor="end" fontWeight="bold">6.2m</text>
+                <text x="32" y="104" fontSize="9" fill="#686B7D" textAnchor="end">4.0m</text>
+                <line x1="40" y1="140" x2="490" y2="140" stroke="#E5E7F0" strokeWidth="1" />
+
+                {/* Path area */}
+                <path
+                  d="M 50,110 L 115,100 L 180,85 L 245,65 L 310,50 L 375,35 L 440,22 L 440,140 L 50,140 Z"
+                  fill="url(#waterGrad)"
+                />
+                <path
+                  d="M 50,110 L 115,100 L 180,85 L 245,65 L 310,50 L 375,35 L 440,22"
+                  fill="none"
+                  stroke="#7047E8"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+
+                {/* Points */}
+                {waterLevel7D.map((val, i) => {
+                  const cx = 50 + i * 65;
+                  const cy = 140 - (val / 8.5) * 125;
+                  return (
+                    <g key={i}>
+                      <circle cx={cx} cy={cy} r="3.5" fill={val >= 6.2 ? '#E5484D' : '#7047E8'} />
+                      <text x={cx} y="153" fontSize="9" fill="#686B7D" textAnchor="middle">
+                        {days7D[i]}
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Recent Predictions Table & Recent Alerts (5 cols) */}
+        <div className="lg:col-span-5 space-y-6">
+          {/* Component 1: Recent Predictions Table (Panel 5) */}
+          <div className="rounded-2xl bg-white border border-[#E5E7F0] p-5 shadow-sm">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E5E7F0] mb-4">
+              <div>
+                <h3 className="font-bold text-sm text-[#17182B]">Recent Predictions</h3>
+                <p className="text-xs text-[#686B7D]">Latest ML basin inferences across India</p>
+              </div>
+              <Link to="/prediction" className="text-xs font-bold text-[#7047E8] hover:underline">
+                New Run
+              </Link>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-white/[0.08] text-[#71717A] uppercase font-mono tracking-wider text-[11px]">
-                    <th className="py-3 px-3">ID</th>
-                    <th className="py-3 px-3">Basin / City</th>
-                    <th className="py-3 px-3">Threat</th>
-                    <th className="py-3 px-3">Probability</th>
-                    <th className="py-3 px-3">Timestamp</th>
-                    <th className="py-3 px-3 text-right">Status</th>
+                  <tr className="border-b border-[#E5E7F0] text-[10px] font-bold text-[#686B7D] uppercase tracking-wider">
+                    <th className="pb-2">Location</th>
+                    <th className="pb-2">Risk</th>
+                    <th className="pb-2">Probability</th>
+                    <th className="pb-2 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/[0.05] font-sans">
-                  {filteredPredictions.map((row) => (
-                    <tr key={row.id} className="hover:bg-[#0D0F17]/60 transition-colors">
-                      <td className="py-3 px-3 font-mono text-[#A78BFA] font-semibold">{row.id}</td>
-                      <td className="py-3 px-3">
-                        <span className="font-semibold text-white block">{row.location}</span>
-                        <span className="text-[10px] text-[#71717A]">{row.state}</span>
+                <tbody className="divide-y divide-[#E5E7F0]">
+                  {mockRecentPredictions.slice(0, 5).map((pred) => (
+                    <tr key={pred.id} className="hover:bg-[#F8FAFC] transition-colors">
+                      <td className="py-2.5">
+                        <div className="font-bold text-[#17182B]">{pred.location}</div>
+                        <div className="text-[10px] text-[#686B7D]">{pred.timestamp}</div>
                       </td>
-                      <td className="py-3 px-3">
-                        <RiskBadge level={row.riskLevel} size="sm" />
+                      <td className="py-2.5">
+                        <RiskBadge level={pred.riskLevel} size="sm" />
                       </td>
-                      <td className="py-3 px-3 font-mono font-bold text-white">
-                        {row.probability}%
+                      <td className="py-2.5 font-bold text-[#17182B]">
+                        {pred.probability}%
                       </td>
-                      <td className="py-3 px-3 font-mono text-[#A1A1AA] text-[11px]">
-                        {row.date}
-                      </td>
-                      <td className="py-3 px-3 text-right font-mono text-[10px]">
-                        <span className="px-2 py-0.5 rounded bg-[#0D0F17] border border-white/[0.08] text-[#A1A1AA]">
-                          {row.status}
-                        </span>
+                      <td className="py-2.5 text-right">
+                        <Link
+                          to="/response"
+                          className="text-[11px] font-semibold text-[#7047E8] hover:underline inline-flex items-center gap-1"
+                        >
+                          <span>Plan</span>
+                          <ArrowRight size={11} />
+                        </Link>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            )}
+            </div>
           </div>
-        </div>
 
-        {/* Geographic Preview Column */}
-        <div className="lg:col-span-4 rounded-3xl bg-[#171925] border border-white/[0.08] p-6 flex flex-col justify-between shadow-2xl">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
+          {/* Component 2: Active Alerts Panel (Panel 5) */}
+          <div className="rounded-2xl bg-white border border-[#E5E7F0] p-5 shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E5E7F0]">
               <div className="flex items-center gap-2">
-                <MapPin size={16} className="text-[#8B5CF6]" />
-                <h3 className="text-sm font-bold text-white font-mono uppercase tracking-wider">
-                  Spatial Matrix
-                </h3>
+                <ShieldAlert size={16} className="text-[#E5484D]" />
+                <h3 className="font-bold text-sm text-[#17182B]">Active Flood Alerts</h3>
               </div>
+              <span className="text-[10px] bg-[#FEF2F2] text-[#E5484D] font-bold px-2 py-0.5 rounded-full border border-[#FECACA]">
+                3 Active
+              </span>
+            </div>
+
+            {/* Alert Items */}
+            <div className="space-y-3">
+              {/* Alert 1 */}
+              <div className="p-3.5 rounded-xl bg-[#FEF2F2] border border-[#FECACA] space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#E5484D] flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#E5484D] animate-ping" />
+                    Critical Inundation Warning
+                  </span>
+                  <span className="text-[10px] text-[#991B1B] font-semibold">10m ago</span>
+                </div>
+                <p className="text-xs text-[#17182B] font-medium">
+                  Musi River Corridor &bull; Hussain Sagar Overspill
+                </p>
+                <p className="text-[11px] text-[#686B7D]">
+                  Low-lying communities instructed to evacuate to elevated rally grounds immediately.
+                </p>
+              </div>
+
+              {/* Alert 2 */}
+              <div className="p-3.5 rounded-xl bg-[#FFFBEB] border border-[#FDE68A] space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#E9A23B] flex items-center gap-1.5">
+                    <AlertTriangle size={13} />
+                    Spillway Gate Release Warning
+                  </span>
+                  <span className="text-[10px] text-[#92400E] font-semibold">45m ago</span>
+                </div>
+                <p className="text-xs text-[#17182B] font-medium">
+                  Himayat Sagar & Osman Sagar Reservoirs
+                </p>
+                <p className="text-[11px] text-[#686B7D]">
+                  4 gates raised by 2 feet. Downstream causeways closed to vehicular traffic.
+                </p>
+              </div>
+
+              {/* Alert 3 */}
+              <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E5E7F0] space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#7047E8] flex items-center gap-1.5">
+                    <Activity size={13} />
+                    Urban Storm Drain Surcharge
+                  </span>
+                  <span className="text-[10px] text-[#686B7D] font-semibold">2h ago</span>
+                </div>
+                <p className="text-xs text-[#17182B] font-medium">
+                  Begumpet & Khairatabad Drainage Sinks
+                </p>
+                <p className="text-[11px] text-[#686B7D]">
+                  Precipitation accumulation exceeding pump discharge capacity. Avoid underpasses.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2">
               <Link
-                to="/risk-map"
-                className="text-[11px] font-mono text-[#A78BFA] hover:underline flex items-center gap-1"
+                to="/response"
+                className="w-full py-2.5 rounded-xl bg-[#F1EBFF] hover:bg-[#E7DEFE] text-[#7047E8] text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
               >
-                <span>Full Map</span>
-                <ExternalLink size={12} />
+                <span>View Full Emergency Response Protocols</span>
+                <ArrowRight size={13} />
               </Link>
             </div>
-
-            <p className="text-xs text-[#A1A1AA] leading-relaxed">
-              Active telemetry monitoring across 8 critical river corridors in India.
-            </p>
-
-            <div className="space-y-2">
-              {mockRiskLocations.slice(0, 4).map((loc) => (
-                <div
-                  key={loc.id}
-                  className="p-3 rounded-2xl bg-[#0D0F17] border border-white/[0.08] flex items-center justify-between text-xs"
-                >
-                  <div>
-                    <span className="font-semibold text-white block">{loc.name}</span>
-                    <span className="text-[10px] text-[#71717A]">{loc.basin}</span>
-                  </div>
-                  <RiskBadge level={loc.riskLevel} size="sm" showIcon={false} />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="pt-4 border-t border-white/[0.08]">
-            <Link
-              to="/risk-map"
-              className="w-full py-3 rounded-2xl bg-[#0D0F17] hover:bg-[#1D2030] border border-white/[0.08] text-white font-bold text-xs uppercase tracking-wider font-mono flex items-center justify-center gap-2 transition-all"
-            >
-              <Compass size={14} className="text-[#A78BFA]" />
-              <span>Open Geographic Intelligence</span>
-            </Link>
           </div>
         </div>
       </div>

@@ -1,30 +1,31 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   BrainCircuit,
   RotateCcw,
-  Sparkles,
   MapPin,
   CloudRain,
   Waves,
-  Layers,
-  ArrowRight,
-  ShieldCheck,
-  Zap
+  Thermometer,
+  Droplets,
+  ChevronRight,
+  Sliders,
+  ArrowRight
 } from 'lucide-react';
-import SectionTitle from '../components/SectionTitle';
 import PredictionCard from '../components/PredictionCard';
 import SimulationBanner from '../components/SimulationBanner';
 import { mockSampleScenarios } from '../data/mockData';
 
 const INITIAL_FORM_STATE = {
-  latitude: '19.0760',
-  longitude: '72.8777',
-  elevation: '142.0',
-  rainfall: '215.4',
+  location: 'Hyderabad, Telangana',
+  latitude: '17.3850',
+  longitude: '78.4867',
+  elevation: '505.0',
+  rainfall: '248.0',
   temperature: '28.5',
   humidity: '88.0',
   riverDischarge: '3840.0',
-  waterLevel: '7.85',
+  waterLevel: '7.4',
   historicalFloods: '1',
   landCover: 'Urban',
   soilType: 'Clay',
@@ -32,27 +33,23 @@ const INITIAL_FORM_STATE = {
   infrastructure: '1'
 };
 
-const LAND_COVER_OPTIONS = [
-  'Water Body',
-  'Desert',
-  'Forest',
-  'Agricultural',
-  'Urban'
-];
-
-const SOIL_TYPE_OPTIONS = [
-  'Clay',
-  'Peat',
-  'Loam',
-  'Sandy',
-  'Silt'
-];
+const DEFAULT_PREDICTION = {
+  floodProbability: 82,
+  riskLevel: 'HIGH',
+  modelConfidence: 89,
+  recommendation:
+    'HIGH FLOOD RISK: Elevated water volume detected across Musi River basin. Low-lying urban sectors and floodplains face imminent inundation. Coordinate immediate safe ground relocation and monitor drainage barriers.',
+  timestamp: new Date().toISOString(),
+  location: 'Hyderabad, Telangana',
+  isMock: true
+};
 
 export default function Prediction() {
   const [formData, setFormData] = useState(INITIAL_FORM_STATE);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [errors, setErrors] = useState({});
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [predictionResult, setPredictionResult] = useState(null);
+  const [predictionResult, setPredictionResult] = useState(DEFAULT_PREDICTION);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -63,32 +60,25 @@ export default function Prediction() {
   };
 
   const loadScenario = (scenario) => {
-    setFormData(scenario.data);
+    setFormData({
+      ...INITIAL_FORM_STATE,
+      ...scenario.data,
+      location: scenario.name
+    });
     setErrors({});
-    setPredictionResult(null);
   };
 
   const validateForm = () => {
     const newErrors = {};
 
-    const lat = parseFloat(formData.latitude);
-    if (isNaN(lat) || lat < 6.0 || lat > 38.0) {
-      newErrors.latitude = 'Indian lat bounds (~6° to 38° N)';
-    }
-
-    const lng = parseFloat(formData.longitude);
-    if (isNaN(lng) || lng < 68.0 || lng > 98.0) {
-      newErrors.longitude = 'Indian lng bounds (~68° to 98° E)';
-    }
-
-    const elev = parseFloat(formData.elevation);
-    if (isNaN(elev) || elev < 0 || elev > 9000) {
-      newErrors.elevation = 'Elevation (0 - 9000 m)';
-    }
-
     const rain = parseFloat(formData.rainfall);
     if (isNaN(rain) || rain < 0 || rain > 1000) {
       newErrors.rainfall = 'Rainfall (0 - 1000 mm)';
+    }
+
+    const waterLvl = parseFloat(formData.waterLevel);
+    if (isNaN(waterLvl) || waterLvl < 0 || waterLvl > 30) {
+      newErrors.waterLevel = 'Water level (0 - 30 m)';
     }
 
     const temp = parseFloat(formData.temperature);
@@ -101,21 +91,6 @@ export default function Prediction() {
       newErrors.humidity = 'Humidity (0% - 100%)';
     }
 
-    const discharge = parseFloat(formData.riverDischarge);
-    if (isNaN(discharge) || discharge < 0 || discharge > 25000) {
-      newErrors.riverDischarge = 'River discharge (0 - 25000 m³/s)';
-    }
-
-    const waterLvl = parseFloat(formData.waterLevel);
-    if (isNaN(waterLvl) || waterLvl < 0 || waterLvl > 30) {
-      newErrors.waterLevel = 'Water level (0 - 30 m)';
-    }
-
-    const pop = parseFloat(formData.populationDensity);
-    if (isNaN(pop) || pop < 0) {
-      newErrors.populationDensity = 'Cannot be negative';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -125,40 +100,36 @@ export default function Prediction() {
     if (!validateForm()) return;
 
     setIsAnalyzing(true);
-    setPredictionResult(null);
 
-    // Realistic Mock Prediction Calculation
     setTimeout(() => {
       const rain = parseFloat(formData.rainfall) || 0;
       const discharge = parseFloat(formData.riverDischarge) || 0;
       const waterLvl = parseFloat(formData.waterLevel) || 0;
       const elev = parseFloat(formData.elevation) || 100;
-      const hist = parseInt(formData.historicalFloods, 10) || 0;
       const isUrban = formData.landCover === 'Urban';
       const isClay = formData.soilType === 'Clay' || formData.soilType === 'Peat';
 
       let score = 0;
-      score += Math.min(40, (rain / 250) * 40);
+      score += Math.min(45, (rain / 250) * 45);
       score += Math.min(25, (discharge / 4500) * 25);
-      score += Math.min(25, (waterLvl / 9.0) * 25);
+      score += Math.min(25, (waterLvl / 8.5) * 25);
       if (elev < 100) score += 10;
       else if (elev > 1000) score -= 15;
-      if (hist === 1) score += 5;
       if (isUrban) score += 5;
       if (isClay) score += 5;
 
-      const probability = Math.min(96, Math.max(8, Math.round(score)));
+      const probability = Math.min(96, Math.max(10, Math.round(score)));
 
       let riskLevel = 'LOW';
       let recommendation = '';
       if (probability >= 85) {
         riskLevel = 'CRITICAL';
         recommendation =
-          'CRITICAL FLOOD DANGER: Impending channel overspill detected. Immediate evacuation of low-lying floodplains is strongly advised. Follow local NDRF and emergency directives.';
+          'CRITICAL FLOOD DANGER: Impending channel overspill detected. Immediate evacuation of low-lying floodplains is strongly advised. Follow local emergency directives.';
       } else if (probability >= 65) {
         riskLevel = 'HIGH';
         recommendation =
-          'HIGH RISK: Exercise caution and monitor local emergency guidance. Consider moving valuable assets and vulnerable residents to higher ground before drainage systems surcharge.';
+          'HIGH RISK: Water level exceeds warning thresholds. Low-lying zones face severe waterlogging. Coordinate safe relocation and monitor drainage barriers.';
       } else if (probability >= 35) {
         riskLevel = 'MODERATE';
         recommendation =
@@ -172,9 +143,10 @@ export default function Prediction() {
       setPredictionResult({
         floodProbability: probability,
         riskLevel,
-        modelConfidence: Math.floor(84 + Math.random() * 8),
+        modelConfidence: Math.floor(85 + Math.random() * 8),
         recommendation,
         timestamp: new Date().toISOString(),
+        location: formData.location || 'Selected Basin',
         isMock: true
       });
 
@@ -185,418 +157,361 @@ export default function Prediction() {
   const handleReset = () => {
     setFormData(INITIAL_FORM_STATE);
     setErrors({});
-    setPredictionResult(null);
+    setPredictionResult(DEFAULT_PREDICTION);
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
-      {/* Page Header */}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 bg-[#F8FAFC]">
+      {/* ----------------- BREADCRUMB ----------------- */}
+      <nav className="flex items-center gap-2 text-xs text-[#686B7D]">
+        <Link to="/" className="hover:text-[#7047E8] transition-colors">
+          Home
+        </Link>
+        <ChevronRight size={13} />
+        <span className="font-semibold text-[#17182B]">Flood Prediction</span>
+      </nav>
+
+      {/* ----------------- PAGE HEADER ----------------- */}
       <div>
-        <SectionTitle
-          badge="Predictive Inundation Engine"
-          title="Flood Risk Prediction"
-          subtitle="Provide environmental and geographic conditions to estimate flood risk using calibrated simulation models."
-        />
-
-        {/* Integration Status Notice */}
-        <SimulationBanner
-          title="SIMULATION INTERFACE &bull; CALIBRATED MODEL DEMO"
-          message="Parameters reflect the 13 raw India dataset features. Inundation probabilities are computed using a calibrated simulation algorithm while trained XGBoost / LightGBM models are prepared in Python."
-          variant="orange"
-        />
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F1EBFF] text-[#7047E8] text-xs font-semibold mb-2">
+          <BrainCircuit size={13} />
+          <span>Machine Learning Simulation</span>
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-[#17182B] tracking-tight">
+          AI Flood Prediction Model
+        </h1>
+        <p className="text-sm sm:text-base text-[#686B7D] max-w-2xl mt-1.5">
+          Enter environmental and geospatial parameters to predict flood probability and generate proactive risk assessments.
+        </p>
       </div>
 
-      {/* Benchmark Presets */}
-      <div className="rounded-3xl bg-[#171925] backdrop-blur-md border border-white/[0.08] p-5 space-y-3">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-semibold uppercase tracking-wider text-white font-mono flex items-center gap-1.5">
-            <Sparkles size={14} className="text-[#C084FC]" />
-            Quick Benchmark Scenarios
-          </span>
-          <span className="text-[#71717A] font-mono text-[11px]">Click to auto-populate parameters</span>
-        </div>
+      <SimulationBanner />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {mockSampleScenarios.map((scen) => (
-            <button
-              key={scen.id}
-              type="button"
-              onClick={() => loadScenario(scen)}
-              className="text-left p-3.5 rounded-2xl bg-[#0D0F17] border border-white/[0.08] hover:border-[#8B5CF6]/40 hover:bg-[#1D2030] transition-all group cursor-pointer"
-            >
-              <div className="text-xs font-bold text-white group-hover:text-[#A78BFA] transition-colors font-mono">
-                {scen.title}
-              </div>
-              <p className="text-[11px] text-[#A1A1AA] mt-1 leading-snug">
-                {scen.description}
-              </p>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Main Grid: 4-Group Form on Left / Result on Right */}
+      {/* ----------------- 3-COLUMN MAIN LAYOUT ----------------- */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Form Container with 4 Grouped Cards */}
-        <div className="lg:col-span-7 space-y-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* GROUP 1: Location */}
-            <div className="rounded-3xl bg-[#171925] backdrop-blur-md border border-white/[0.08] p-6 space-y-4 hover:border-[#8B5CF6]/25 transition-all">
-              <div className="flex items-center gap-2.5 pb-3 border-b border-white/[0.08]">
-                <div className="p-2 rounded-xl bg-[#8B5CF6]/15 text-[#A78BFA]">
-                  <MapPin size={16} />
+        {/* Left Column: 3-Step Stepper & Preset Scenarios */}
+        <div className="lg:col-span-3 space-y-6">
+          {/* Stepper Card */}
+          <div className="rounded-2xl bg-white border border-[#E5E7F0] p-5 shadow-sm space-y-4">
+            <h3 className="text-xs font-bold text-[#686B7D] uppercase tracking-wider">
+              Workflow Steps
+            </h3>
+
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="w-7 h-7 rounded-full bg-[#7047E8] text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                  1
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white font-mono uppercase tracking-wider">
-                    1. Geographic Location & Topography
-                  </h3>
-                  <p className="text-[11px] text-[#A1A1AA]">Spatial telemetry and terrain elevation</p>
+                  <h4 className="text-xs font-bold text-[#17182B]">Location Details</h4>
+                  <p className="text-[11px] text-[#686B7D]">Target basin & coordinates</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-[#A1A1AA] mb-1">
-                    Latitude (°N) <span className="text-[#FF4D6D]">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    name="latitude"
-                    value={formData.latitude}
-                    onChange={handleInputChange}
-                    placeholder="e.g. 19.0760"
-                    className="w-full px-3 py-2 rounded-xl bg-[#0D0F17] border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6]/50 transition-all placeholder:text-[#71717A]"
-                  />
-                  {errors.latitude && (
-                    <p className="text-[10px] text-[#FF4D6D] mt-1 font-mono">{errors.latitude}</p>
-                  )}
-                </div>
+              <div className="w-0.5 h-4 bg-[#7047E8]/30 ml-3.5" />
 
-                <div>
-                  <label className="block text-xs font-medium text-[#A1A1AA] mb-1">
-                    Longitude (°E) <span className="text-[#FF4D6D]">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    name="longitude"
-                    value={formData.longitude}
-                    onChange={handleInputChange}
-                    placeholder="e.g. 72.8777"
-                    className="w-full px-3 py-2 rounded-xl bg-[#0D0F17] border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6]/50 transition-all placeholder:text-[#71717A]"
-                  />
-                  {errors.longitude && (
-                    <p className="text-[10px] text-[#FF4D6D] mt-1 font-mono">{errors.longitude}</p>
-                  )}
+              <div className="flex items-start gap-3">
+                <div className="w-7 h-7 rounded-full bg-[#7047E8] text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                  2
                 </div>
-
                 <div>
-                  <label className="block text-xs font-medium text-[#A1A1AA] mb-1">
-                    Elevation (m) <span className="text-[#FF4D6D]">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    name="elevation"
-                    value={formData.elevation}
-                    onChange={handleInputChange}
-                    placeholder="e.g. 142.0"
-                    className="w-full px-3 py-2 rounded-xl bg-[#0D0F17] border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6]/50 transition-all placeholder:text-[#71717A]"
-                  />
-                  {errors.elevation && (
-                    <p className="text-[10px] text-[#FF4D6D] mt-1 font-mono">{errors.elevation}</p>
-                  )}
+                  <h4 className="text-xs font-bold text-[#17182B]">Environmental Data</h4>
+                  <p className="text-[11px] text-[#686B7D]">Rainfall, river levels, soil</p>
+                </div>
+              </div>
+
+              <div className="w-0.5 h-4 bg-[#E5E7F0] ml-3.5" />
+
+              <div className="flex items-start gap-3">
+                <div className="w-7 h-7 rounded-full bg-[#F1EBFF] text-[#7047E8] border border-[#7047E8]/30 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                  3
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-[#17182B]">Prediction Result</h4>
+                  <p className="text-[11px] text-[#686B7D]">Risk score & emergency response</p>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* GROUP 2: Weather */}
-            <div className="rounded-3xl bg-[#171925] backdrop-blur-md border border-white/[0.08] p-6 space-y-4 hover:border-[#8B5CF6]/25 transition-all">
-              <div className="flex items-center gap-2.5 pb-3 border-b border-white/[0.08]">
-                <div className="p-2 rounded-xl bg-[#C084FC]/15 text-[#C084FC]">
-                  <CloudRain size={16} />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-white font-mono uppercase tracking-wider">
-                    2. Meteorological Conditions
-                  </h3>
-                  <p className="text-[11px] text-[#A1A1AA]">Precipitation and atmospheric state</p>
-                </div>
-              </div>
+          {/* Quick Preset Scenarios */}
+          <div className="rounded-2xl bg-white border border-[#E5E7F0] p-5 shadow-sm space-y-3">
+            <h3 className="text-xs font-bold text-[#686B7D] uppercase tracking-wider">
+              Load Preset Scenarios
+            </h3>
+            <p className="text-[11px] text-[#686B7D]">
+              Select a benchmark profile to quickly test the ML inference engine:
+            </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-[#A1A1AA] mb-1">
-                    Rainfall (mm) <span className="text-[#FF4D6D]">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    name="rainfall"
-                    value={formData.rainfall}
-                    onChange={handleInputChange}
-                    placeholder="0 - 300 mm"
-                    className="w-full px-3 py-2 rounded-xl bg-[#0D0F17] border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-[#C084FC] focus:ring-1 focus:ring-[#C084FC]/50 transition-all placeholder:text-[#71717A]"
-                  />
-                  {errors.rainfall && (
-                    <p className="text-[10px] text-[#FF4D6D] mt-1 font-mono">{errors.rainfall}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-[#A1A1AA] mb-1">
-                    Temperature (°C) <span className="text-[#FF4D6D]">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    name="temperature"
-                    value={formData.temperature}
-                    onChange={handleInputChange}
-                    placeholder="15 - 45 °C"
-                    className="w-full px-3 py-2 rounded-xl bg-[#0D0F17] border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-[#C084FC] focus:ring-1 focus:ring-[#C084FC]/50 transition-all placeholder:text-[#71717A]"
-                  />
-                  {errors.temperature && (
-                    <p className="text-[10px] text-[#FF4D6D] mt-1 font-mono">{errors.temperature}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-[#A1A1AA] mb-1">
-                    Humidity (%) <span className="text-[#FF4D6D]">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    name="humidity"
-                    value={formData.humidity}
-                    onChange={handleInputChange}
-                    placeholder="20 - 100 %"
-                    className="w-full px-3 py-2 rounded-xl bg-[#0D0F17] border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-[#C084FC] focus:ring-1 focus:ring-[#C084FC]/50 transition-all placeholder:text-[#71717A]"
-                  />
-                  {errors.humidity && (
-                    <p className="text-[10px] text-[#FF4D6D] mt-1 font-mono">{errors.humidity}</p>
-                  )}
-                </div>
-              </div>
+            <div className="space-y-2 pt-1">
+              {mockSampleScenarios.map((sc) => (
+                <button
+                  key={sc.id}
+                  type="button"
+                  onClick={() => loadScenario(sc)}
+                  className="w-full text-left p-3 rounded-xl border border-[#E5E7F0] hover:border-[#7047E8] bg-[#F8FAFC] hover:bg-[#F1EBFF]/40 transition-all text-xs"
+                >
+                  <div className="font-bold text-[#17182B] flex items-center justify-between">
+                    <span>{sc.name}</span>
+                    <span
+                      className={`text-[10px] px-1.5 py-0.5 rounded font-semibold ${
+                        sc.expectedRisk === 'HIGH'
+                          ? 'bg-[#FEF2F2] text-[#E5484D]'
+                          : sc.expectedRisk === 'MODERATE'
+                          ? 'bg-[#FFFBEB] text-[#E9A23B]'
+                          : 'bg-[#ECFDF5] text-[#22A879]'
+                      }`}
+                    >
+                      {sc.expectedRisk}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-[#686B7D] mt-1 line-clamp-1">{sc.description}</p>
+                </button>
+              ))}
             </div>
+          </div>
+        </div>
 
-            {/* GROUP 3: Hydrology */}
-            <div className="rounded-3xl bg-[#171925] backdrop-blur-md border border-white/[0.08] p-6 space-y-4 hover:border-[#8B5CF6]/25 transition-all">
-              <div className="flex items-center gap-2.5 pb-3 border-b border-white/[0.08]">
-                <div className="p-2 rounded-xl bg-[#F97316]/15 text-[#FB923C]">
-                  <Waves size={16} />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-white font-mono uppercase tracking-wider">
-                    3. Hydrological Factors
-                  </h3>
-                  <p className="text-[11px] text-[#A1A1AA]">River flow velocity and channel heights</p>
-                </div>
+        {/* Center Column: Form Inputs */}
+        <div className="lg:col-span-5">
+          <div className="rounded-2xl bg-white border border-[#E5E7F0] p-6 shadow-sm">
+            <div className="flex items-center justify-between pb-4 border-b border-[#E5E7F0] mb-5">
+              <div>
+                <h2 className="text-base font-bold text-[#17182B]">Location & Environmental Data</h2>
+                <p className="text-xs text-[#686B7D]">Fill in telemetry parameters for inference</p>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-[#A1A1AA] mb-1">
-                    River Discharge (m³/s) <span className="text-[#FF4D6D]">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    name="riverDischarge"
-                    value={formData.riverDischarge}
-                    onChange={handleInputChange}
-                    placeholder="0 - 5000 m³/s"
-                    className="w-full px-3 py-2 rounded-xl bg-[#0D0F17] border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]/50 transition-all placeholder:text-[#71717A]"
-                  />
-                  {errors.riverDischarge && (
-                    <p className="text-[10px] text-[#FF4D6D] mt-1 font-mono">{errors.riverDischarge}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-[#A1A1AA] mb-1">
-                    Water Level (m) <span className="text-[#FF4D6D]">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    name="waterLevel"
-                    value={formData.waterLevel}
-                    onChange={handleInputChange}
-                    placeholder="0 - 10 m"
-                    className="w-full px-3 py-2 rounded-xl bg-[#0D0F17] border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]/50 transition-all placeholder:text-[#71717A]"
-                  />
-                  {errors.waterLevel && (
-                    <p className="text-[10px] text-[#FF4D6D] mt-1 font-mono">{errors.waterLevel}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-[#A1A1AA] mb-1">
-                    Historical Floods <span className="text-[#FF4D6D]">*</span>
-                  </label>
-                  <select
-                    name="historicalFloods"
-                    value={formData.historicalFloods}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 rounded-xl bg-[#0D0F17] border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]/50 transition-all"
-                  >
-                    <option value="1">1 — Documented Prior Floods</option>
-                    <option value="0">0 — No Prior Flood Record</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* GROUP 4: Environment */}
-            <div className="rounded-3xl bg-[#171925] backdrop-blur-md border border-white/[0.08] p-6 space-y-4 hover:border-[#8B5CF6]/25 transition-all">
-              <div className="flex items-center gap-2.5 pb-3 border-b border-white/[0.08]">
-                <div className="p-2 rounded-xl bg-[#8B5CF6]/15 text-[#A78BFA]">
-                  <Layers size={16} />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-white font-mono uppercase tracking-wider">
-                    4. Land, Soil & Demographics
-                  </h3>
-                  <p className="text-[11px] text-[#A1A1AA]">Surface retention and population exposure</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-[#A1A1AA] mb-1">
-                    Land Cover <span className="text-[#FF4D6D]">*</span>
-                  </label>
-                  <select
-                    name="landCover"
-                    value={formData.landCover}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 rounded-xl bg-[#0D0F17] border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6]/50 transition-all"
-                  >
-                    {LAND_COVER_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-[#A1A1AA] mb-1">
-                    Soil Type <span className="text-[#FF4D6D]">*</span>
-                  </label>
-                  <select
-                    name="soilType"
-                    value={formData.soilType}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 rounded-xl bg-[#0D0F17] border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6]/50 transition-all"
-                  >
-                    {SOIL_TYPE_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-[#A1A1AA] mb-1">
-                    Population Density <span className="text-[#FF4D6D]">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    name="populationDensity"
-                    value={formData.populationDensity}
-                    onChange={handleInputChange}
-                    placeholder="e.g. 5000"
-                    className="w-full px-3 py-2 rounded-xl bg-[#0D0F17] border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6]/50 transition-all placeholder:text-[#71717A]"
-                  />
-                  {errors.populationDensity && (
-                    <p className="text-[10px] text-[#FF4D6D] mt-1 font-mono">{errors.populationDensity}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-[#A1A1AA] mb-1">
-                    Infrastructure <span className="text-[#FF4D6D]">*</span>
-                  </label>
-                  <select
-                    name="infrastructure"
-                    value={formData.infrastructure}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 rounded-xl bg-[#0D0F17] border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6]/50 transition-all"
-                  >
-                    <option value="1">1 — Reinforced</option>
-                    <option value="0">0 — Weak/None</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Action Bar */}
-            <div className="flex items-center gap-3 pt-2">
-              <button
-                type="submit"
-                disabled={isAnalyzing}
-                className="flex-1 py-4 px-6 rounded-2xl bg-gradient-to-r from-[#8B5CF6] to-[#C084FC] text-white font-bold text-sm tracking-wide shadow-[0_0_25px_rgba(139,92,246,0.35)] hover:shadow-[0_0_35px_rgba(192,132,252,0.5)] disabled:opacity-60 transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer transform hover:-translate-y-0.5"
-              >
-                {isAnalyzing ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span className="font-mono">Processing 13 Hydro-Meteorological Features...</span>
-                  </>
-                ) : (
-                  <>
-                    <Zap size={18} />
-                    <span>Analyze Flood Risk</span>
-                    <ArrowRight size={17} />
-                  </>
-                )}
-              </button>
-
               <button
                 type="button"
                 onClick={handleReset}
-                className="p-4 rounded-2xl bg-[#171925] hover:bg-[#1D2030] text-[#A1A1AA] hover:text-white border border-white/[0.08] transition-colors cursor-pointer"
-                title="Reset Parameters"
+                className="text-xs text-[#686B7D] hover:text-[#17182B] flex items-center gap-1 font-medium"
               >
-                <RotateCcw size={18} />
+                <RotateCcw size={13} />
+                <span>Reset</span>
               </button>
             </div>
-          </form>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Field 1: Location */}
+              <div>
+                <label className="block text-xs font-semibold text-[#17182B] mb-1">
+                  Target Basin / Location
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#686B7D]">
+                    <MapPin size={16} />
+                  </div>
+                  <input
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-[#E5E7F0] bg-[#F8FAFC] focus:bg-white focus:border-[#7047E8] text-xs font-medium text-[#17182B] outline-none transition-colors"
+                    placeholder="e.g. Hyderabad, Telangana"
+                  />
+                </div>
+              </div>
+
+              {/* Field 2 & 3: Rainfall & Water Level */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-[#17182B] mb-1">
+                    Rainfall (24h) [mm]
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#686B7D]">
+                      <CloudRain size={16} />
+                    </div>
+                    <input
+                      type="number"
+                      step="0.1"
+                      name="rainfall"
+                      value={formData.rainfall}
+                      onChange={handleInputChange}
+                      className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-[#E5E7F0] bg-[#F8FAFC] focus:bg-white focus:border-[#7047E8] text-xs font-medium text-[#17182B] outline-none transition-colors"
+                      placeholder="248"
+                    />
+                  </div>
+                  {errors.rainfall && (
+                    <p className="text-[11px] text-[#E5484D] mt-1">{errors.rainfall}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#17182B] mb-1">
+                    Water Level [m]
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#686B7D]">
+                      <Waves size={16} />
+                    </div>
+                    <input
+                      type="number"
+                      step="0.1"
+                      name="waterLevel"
+                      value={formData.waterLevel}
+                      onChange={handleInputChange}
+                      className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-[#E5E7F0] bg-[#F8FAFC] focus:bg-white focus:border-[#7047E8] text-xs font-medium text-[#17182B] outline-none transition-colors"
+                      placeholder="7.4"
+                    />
+                  </div>
+                  {errors.waterLevel && (
+                    <p className="text-[11px] text-[#E5484D] mt-1">{errors.waterLevel}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Field 4 & 5: Temperature & Humidity */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-[#17182B] mb-1">
+                    Temperature [°C]
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#686B7D]">
+                      <Thermometer size={16} />
+                    </div>
+                    <input
+                      type="number"
+                      step="0.1"
+                      name="temperature"
+                      value={formData.temperature}
+                      onChange={handleInputChange}
+                      className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-[#E5E7F0] bg-[#F8FAFC] focus:bg-white focus:border-[#7047E8] text-xs font-medium text-[#17182B] outline-none transition-colors"
+                      placeholder="28.5"
+                    />
+                  </div>
+                  {errors.temperature && (
+                    <p className="text-[11px] text-[#E5484D] mt-1">{errors.temperature}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#17182B] mb-1">
+                    Humidity [%]
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#686B7D]">
+                      <Droplets size={16} />
+                    </div>
+                    <input
+                      type="number"
+                      step="0.1"
+                      name="humidity"
+                      value={formData.humidity}
+                      onChange={handleInputChange}
+                      className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-[#E5E7F0] bg-[#F8FAFC] focus:bg-white focus:border-[#7047E8] text-xs font-medium text-[#17182B] outline-none transition-colors"
+                      placeholder="88.0"
+                    />
+                  </div>
+                  {errors.humidity && (
+                    <p className="text-[11px] text-[#E5484D] mt-1">{errors.humidity}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Advanced Parameters Toggle */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAdvanced(!showAdvanced)}
+                  className="text-xs text-[#7047E8] font-semibold flex items-center gap-1 hover:underline"
+                >
+                  <Sliders size={13} />
+                  <span>{showAdvanced ? 'Hide Advanced ML Features' : 'Configure Additional 8 ML Features'}</span>
+                </button>
+              </div>
+
+              {/* Advanced Parameters Grid */}
+              {showAdvanced && (
+                <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E5E7F0] space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#17182B] mb-1">
+                        River Discharge (m³/s)
+                      </label>
+                      <input
+                        type="number"
+                        name="riverDischarge"
+                        value={formData.riverDischarge}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 rounded-lg border border-[#E5E7F0] bg-white text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#17182B] mb-1">
+                        Elevation (m)
+                      </label>
+                      <input
+                        type="number"
+                        name="elevation"
+                        value={formData.elevation}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 rounded-lg border border-[#E5E7F0] bg-white text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#17182B] mb-1">
+                        Land Cover
+                      </label>
+                      <select
+                        name="landCover"
+                        value={formData.landCover}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 rounded-lg border border-[#E5E7F0] bg-white text-xs"
+                      >
+                        <option value="Urban">Urban</option>
+                        <option value="Agricultural">Agricultural</option>
+                        <option value="Forest">Forest</option>
+                        <option value="Water Body">Water Body</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#17182B] mb-1">
+                        Soil Type
+                      </label>
+                      <select
+                        name="soilType"
+                        value={formData.soilType}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 rounded-lg border border-[#E5E7F0] bg-white text-xs"
+                      >
+                        <option value="Clay">Clay</option>
+                        <option value="Loam">Loam</option>
+                        <option value="Sandy">Sandy</option>
+                        <option value="Silt">Silt</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <div className="pt-3">
+                <button
+                  type="submit"
+                  disabled={isAnalyzing}
+                  className="w-full py-3.5 px-4 rounded-xl bg-[#7047E8] hover:bg-[#5E35D1] text-white font-semibold text-sm shadow-md shadow-[#7047E8]/20 hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Computing Hydrological Risk...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Predict Flood Risk</span>
+                      <ArrowRight size={16} />
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
 
-        {/* Prediction Result Column */}
-        <div className="lg:col-span-5 space-y-6">
-          {predictionResult ? (
-            <PredictionCard result={predictionResult} onReset={handleReset} />
-          ) : (
-            <div className="rounded-3xl bg-[#171925]/60 backdrop-blur-md border border-dashed border-white/10 p-8 text-center space-y-4">
-              <div className="w-16 h-16 rounded-2xl bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 text-[#A78BFA] flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(139,92,246,0.15)]">
-                <BrainCircuit size={32} />
-              </div>
-              <h4 className="text-base font-bold text-white">AI Inference Engine Standing By</h4>
-              <p className="text-xs text-[#A1A1AA] max-w-sm mx-auto leading-relaxed">
-                Configure your 13 environmental parameters or choose a benchmark scenario above, then execute <strong>Analyze Flood Risk</strong> to simulate threat classification.
-              </p>
-              <div className="pt-2 text-[11px] font-mono text-[#71717A]">
-                Awaiting input telemetry vectors...
-              </div>
-            </div>
-          )}
-
-          {/* Feature Guide Info */}
-          <div className="rounded-3xl bg-[#171925] border border-white/[0.08] p-5 space-y-3 text-xs text-[#A1A1AA]">
-            <div className="flex items-center gap-2 font-mono text-white text-xs font-bold uppercase tracking-wider">
-              <ShieldCheck size={16} className="text-[#8B5CF6]" />
-              <span>Hydrological Validation Rules</span>
-            </div>
-            <ul className="space-y-1.5 list-disc list-inside text-[11px] leading-relaxed">
-              <li><strong>Rainfall Accumulation:</strong> Drives flash and pluvial surface water ponding.</li>
-              <li><strong>River Discharge:</strong> Primary fluvial capacity marker for riparian basins.</li>
-              <li><strong>Elevation & Land Cover:</strong> Determines low-gradient runoff retention.</li>
-              <li><strong>Soil Permeability:</strong> Silt/clay accelerate surface runoff vs sandy soils.</li>
-            </ul>
-          </div>
+        {/* Right Column: Prediction Result Card (Panel 2) */}
+        <div className="lg:col-span-4">
+          <PredictionCard result={predictionResult} inputData={formData} />
         </div>
       </div>
     </div>

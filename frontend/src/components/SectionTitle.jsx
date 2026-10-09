@@ -10,20 +10,20 @@ export default function SectionTitle({
   const isCenter = align === 'center';
 
   return (
-    <div className={`mb-10 ${isCenter ? 'text-center max-w-3xl mx-auto' : ''} ${className}`}>
+    <div className={`mb-8 ${isCenter ? 'text-center max-w-3xl mx-auto' : ''} ${className}`}>
       {badge && (
-        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 text-[#A78BFA] text-[10px] sm:text-xs font-mono font-semibold uppercase tracking-widest mb-3 ${isCenter ? 'mx-auto' : ''}`}>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#8B5CF6] animate-pulse" />
+        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F1EBFF] border border-[#7047E8]/20 text-[#7047E8] text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-2.5 ${isCenter ? 'mx-auto' : ''}`}>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#7047E8]" />
           <span>{badge}</span>
         </div>
       )}
 
-      <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white mb-3 leading-tight">
+      <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#17182B] mb-2 leading-tight">
         {title}
       </h2>
 
       {subtitle && (
-        <p className={`text-sm sm:text-base text-[#A1A1AA] leading-relaxed max-w-2xl ${isCenter ? 'mx-auto' : ''}`}>
+        <p className={`text-sm text-[#686B7D] leading-relaxed max-w-2xl ${isCenter ? 'mx-auto' : ''}`}>
           {subtitle}
         </p>
       )}

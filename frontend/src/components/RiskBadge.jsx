@@ -3,40 +3,36 @@ import { ShieldCheck, AlertTriangle, AlertOctagon, Flame } from 'lucide-react';
 
 const BADGE_CONFIG = {
   LOW: {
-    bg: 'bg-[#34D399]/10',
-    border: 'border-[#34D399]/30',
-    text: 'text-[#34D399]',
-    dot: 'bg-[#34D399]',
-    glow: 'shadow-[0_0_12px_rgba(52,211,153,0.25)]',
+    bg: 'bg-[#22A879]/10',
+    border: 'border-[#22A879]/30',
+    text: 'text-[#22A879]',
+    dot: 'bg-[#22A879]',
     icon: ShieldCheck,
-    label: 'LOW RISK'
+    label: 'Low Risk'
   },
   MODERATE: {
-    bg: 'bg-[#FBBF24]/10',
-    border: 'border-[#FBBF24]/30',
-    text: 'text-[#FBBF24]',
-    dot: 'bg-[#FBBF24]',
-    glow: 'shadow-[0_0_12px_rgba(251,191,36,0.25)]',
+    bg: 'bg-[#E9A23B]/10',
+    border: 'border-[#E9A23B]/30',
+    text: 'text-[#E9A23B]',
+    dot: 'bg-[#E9A23B]',
     icon: AlertTriangle,
-    label: 'MODERATE RISK'
+    label: 'Moderate Risk'
   },
   HIGH: {
-    bg: 'bg-[#F97316]/15',
-    border: 'border-[#F97316]/40',
-    text: 'text-[#F97316]',
-    dot: 'bg-[#F97316]',
-    glow: 'shadow-[0_0_14px_rgba(249,115,22,0.3)]',
+    bg: 'bg-[#E5484D]/10',
+    border: 'border-[#E5484D]/30',
+    text: 'text-[#E5484D]',
+    dot: 'bg-[#E5484D]',
     icon: AlertOctagon,
-    label: 'HIGH RISK'
+    label: 'High Risk'
   },
   CRITICAL: {
-    bg: 'bg-[#FF4D6D]/15',
-    border: 'border-[#FF4D6D]/40',
-    text: 'text-[#FF4D6D]',
-    dot: 'bg-[#FF4D6D]',
-    glow: 'shadow-[0_0_16px_rgba(255,77,109,0.35)]',
+    bg: 'bg-[#E5484D]/15',
+    border: 'border-[#E5484D]/40',
+    text: 'text-[#E5484D]',
+    dot: 'bg-[#E5484D]',
     icon: Flame,
-    label: 'CRITICAL ALERT'
+    label: 'Critical Risk'
   }
 };
 
@@ -46,7 +42,7 @@ export default function RiskBadge({ level = 'LOW', size = 'md', showIcon = true,
   const IconComponent = config.icon;
 
   const sizeClasses = {
-    sm: 'text-[10px] px-2 py-0.5 gap-1.5',
+    sm: 'text-[10px] px-2 py-0.5 gap-1.5 font-medium',
     md: 'text-xs font-semibold px-2.5 py-1 gap-1.5',
     lg: 'text-sm font-bold px-3.5 py-1.5 gap-2'
   };
@@ -54,14 +50,14 @@ export default function RiskBadge({ level = 'LOW', size = 'md', showIcon = true,
   const iconSizes = {
     sm: 11,
     md: 13,
-    lg: 16
+    lg: 15
   };
 
   return (
     <span
       role="status"
       aria-label={`Flood Threat Level: ${config.label}`}
-      className={`inline-flex items-center rounded-full border tracking-wider uppercase font-mono transition-all backdrop-blur-sm ${config.bg} ${config.border} ${config.text} ${config.glow} ${sizeClasses[size] || sizeClasses.md}`}
+      className={`inline-flex items-center rounded-full border tracking-wide transition-all ${config.bg} ${config.border} ${config.text} ${sizeClasses[size] || sizeClasses.md}`}
     >
       <span className="relative flex h-2 w-2 shrink-0">
         {pulse && (
